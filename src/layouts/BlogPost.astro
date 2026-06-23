@@ -1,0 +1,76 @@
+---
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+import FormattedDate from "../components/FormattedDate.astro";
+import Comments from "../components/Comments.astro";
+
+type Props = CollectionEntry<"blog">["data"];
+
+const { title, description, pubDate, updatedDate, heroImage, category } =
+  Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="max-w-4xl mx-auto pb-12">
+    <!-- Header do Artigo -->
+    <header class="mb-12 text-center">
+      <h1
+        class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-zinc-900 dark:text-brand-text leading-tight"
+      >
+        {title}
+      </h1>
+
+      {
+        category && (
+          <div class="flex flex-wrap justify-center gap-3 mb-8">
+            <span class="px-4 py-1.5 bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary rounded-full text-sm font-bold border border-brand-primary/20 tracking-wider uppercase">
+              {category}
+            </span>
+          </div>
+        )
+      }
+
+      <div
+        class="flex items-center justify-center gap-4 text-zinc-600 dark:text-zinc-400 font-medium"
+      >
+        <FormattedDate date={pubDate} />
+        {
+          updatedDate && (
+            <>
+              <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+              <span class="italic">
+                Atualizado em <FormattedDate date={updatedDate} />
+              </span>
+            </>
+          )
+        }
+      </div>
+    </header>
+
+    <!-- Cover Image -->
+    {
+      heroImage && (
+        <div class="w-full rounded-3xl overflow-hidden shadow-2xl mb-16 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-brand-surface aspect-video">
+          <img
+            src={
+              heroImage.src || (typeof heroImage === "string" ? heroImage : "")
+            }
+            alt={title}
+            class="w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
+      )
+    }
+
+    <!-- Conteúdo MDX/Markdown -->
+    <div
+      class="prose prose-zinc dark:prose-invert prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-h2:text-4xl prose-h3:text-3xl prose-a:text-brand-primary dark:prose-a:text-brand-accent w-full mx-auto"
+    >
+      <slot />
+    </div>
+
+    <!-- Comentários -->
+    <Comments />
+  </article>
+</BaseLayout>

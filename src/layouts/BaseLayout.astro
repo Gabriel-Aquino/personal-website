@@ -1,0 +1,37 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: ImageMetadata;
+  ignoreSearch?: boolean;
+}
+
+const { title, description, image, ignoreSearch = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="pt-BR" class="antialiased">
+  <head>
+    <BaseHead title={title} description={description} image={image} />
+
+    <!-- Espaço reservado para o script do Google AdSense -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXX" crossorigin="anonymous"></script> -->
+  </head>
+  <body 
+    class="flex flex-col min-h-screen"
+    {...(ignoreSearch ? { "data-pagefind-ignore": "all" } : {})}
+  >
+    <Header />
+    <main
+      class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pt-24"
+    >
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

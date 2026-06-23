@@ -1,0 +1,41 @@
+---
+title: "O Poder do MDX: Componentes Híbridos"
+pubDate: "2026-06-23"
+category: "Tech"
+isMonetized: true
+tags: ["Astro", "MDX", "Frontend"]
+heroImage: "../../assets/blog-placeholder-5.jpg"
+description: "Demonstração prática dos nossos novos componentes MDX fáceis de usar e super performáticos."
+---
+
+import ProductCard from "../../components/mdx/ProductCard.astro";
+import VideoPlayer from "../../components/mdx/VideoPlayer.astro";
+
+Neste artigo, demonstramos na prática a flexibilidade do nosso Hub Digital. Conseguimos escrever conteúdo focado em SEO de forma fluida (usando Markdown) e, ao mesmo tempo, injetar **componentes Astro altamente interativos e focados em monetização**.
+
+## 1. Cards de Produtos Afiliados
+
+A monetização do blog dependerá de links contextuais. Veja o nosso componente `<ProductCard />` em ação:
+
+<ProductCard
+  title="Teclado Mecânico Keychron K2"
+  description="O melhor teclado mecânico wireless para programadores. Switches hot-swappable e bateria de longa duração."
+  imageUrl="https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&q=80&w=400&h=300"
+  affiliateLink="https://amazon.com.br"
+  price="R$ 650,00"
+  badge="Recomendado"
+/>
+
+Note como o card se adapta perfeitamente ao _Dark Mode_, utiliza variáveis de cor globais e aplica efeitos sutis de _Glassmorphism_.
+
+## 2. Incorporação de Vídeos (Lazy Loaded)
+
+Embedar vídeos do YouTube destrói a pontuação de performance (Core Web Vitals). Por isso, desenvolvemos o `<VideoPlayer />` otimizado:
+
+<VideoPlayer videoId="dQw4w9WgXcQ" title="Demonstração" />
+
+O iFrame possui o atributo `loading="lazy"` e usa o domínio de privacidade do YouTube (`youtube-nocookie.com`), garantindo que o tempo de carregamento da página continue sendo de milissegundos.
+
+---
+
+O MDX transforma um simples site estático numa **máquina de conversão e monetização** extremamente veloz.

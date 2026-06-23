@@ -1,0 +1,29 @@
+services:
+  # Ambiente de Desenvolvimento (Hot Reload Ativo)
+  # Uso: docker-compose up dev
+  dev:
+    build:
+      context: .
+      target: dev
+    ports:
+      - "4321:4321"
+    volumes:
+      - .:/app
+      # Protegemos o node_modules local para não ser sobrescrito pelo container
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      # Ativa o polling do Vite (essencial para hot reload no Docker do Mac/Windows)
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+
+  # Ambiente de Produção (Teste Local do SSG + Nginx)
+  # Uso: docker-compose up prod
+  prod:
+    build:
+      context: .
+      target: prod
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=production

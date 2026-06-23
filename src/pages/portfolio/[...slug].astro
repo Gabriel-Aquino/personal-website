@@ -1,0 +1,93 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Comments from "../../components/Comments.astro";
+
+export async function getStaticPaths() {
+  const projects = await getCollection("portfolio");
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<BaseLayout
+  title={`${project.data.projectName} | Portfólio`}
+  description={`Detalhes do projeto ${project.data.projectName}`}
+>
+  <article class="max-w-4xl mx-auto pb-12">
+    <!-- Header do Projeto -->
+    <header class="mb-12 text-center">
+      <h1
+        class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 dark:text-brand-text leading-tight"
+      >
+        {project.data.projectName}
+      </h1>
+
+      <div class="flex flex-wrap justify-center gap-3 mb-8">
+        {
+          project.data.techStack.map((tech) => (
+            <span class="px-4 py-1.5 bg-brand-accent/10 dark:bg-brand-accent/20 text-brand-accent rounded-full text-sm font-bold border border-brand-accent/20 tracking-wider uppercase">
+              {tech}
+            </span>
+          ))
+        }
+      </div>
+
+      <div class="flex justify-center gap-4">
+        {
+          project.data.githubUrl && (
+            <a
+              href={project.data.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-6 py-2.5 bg-zinc-900 text-zinc-50 dark:bg-brand-surface dark:border dark:border-zinc-800 dark:text-brand-text font-bold rounded-xl hover:scale-105 transition-transform duration-300 shadow-lg"
+            >
+              Repositório Github
+            </a>
+          )
+        }
+        {
+          project.data.liveUrl && (
+            <a
+              href={project.data.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="px-6 py-2.5 bg-brand-primary text-white font-bold rounded-xl hover:scale-105 transition-transform duration-300 shadow-lg shadow-brand-primary/30"
+            >
+              Ver ao Vivo
+            </a>
+          )
+        }
+      </div>
+    </header>
+
+    <!-- Cover Image -->
+    {
+      project.data.coverImage && (
+        <div class="w-full rounded-3xl overflow-hidden shadow-2xl mb-16 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-brand-surface aspect-video">
+          <img
+            src={project.data.coverImage.src}
+            alt={project.data.projectName}
+            class="w-full h-full object-cover"
+            loading="eager"
+          />
+        </div>
+      )
+    }
+
+    <!-- Conteúdo MDX -->
+    <div
+      class="prose prose-zinc dark:prose-invert prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-h2:text-4xl prose-h3:text-3xl prose-a:text-brand-primary dark:prose-a:text-brand-accent w-full mx-auto"
+    >
+      <Content />
+    </div>
+
+    <!-- Comentários -->
+    <Comments />
+  </article>
+</BaseLayout>

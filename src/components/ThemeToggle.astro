@@ -1,0 +1,91 @@
+---
+
+---
+
+<button
+  id="theme-toggle"
+  role="switch"
+  aria-label="Alternar Tema"
+  class="relative flex h-7 w-14 cursor-pointer items-center rounded-full bg-zinc-200 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-brand-primary"
+>
+  <span class="sr-only">Alternar Tema</span>
+
+  <!-- Track Icons -->
+  <span
+    class="absolute inset-y-0 left-1.5 flex items-center justify-center pointer-events-none"
+  >
+    <!-- Sun Icon -->
+    <svg
+      class="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-2.25l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+      ></path>
+    </svg>
+  </span>
+  <span
+    class="absolute inset-y-0 right-1.5 flex items-center justify-center pointer-events-none"
+  >
+    <!-- Moon Icon -->
+    <svg
+      class="h-3.5 w-3.5 text-zinc-500 dark:text-zinc-400"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke-width="2"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"
+      ></path>
+    </svg>
+  </span>
+
+  <!-- Knob -->
+  <span
+    class="relative z-10 inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 translate-x-1 dark:translate-x-8 dark:bg-brand-accent"
+  ></span>
+</button>
+
+<script>
+  function setupThemeToggle() {
+    const themeToggleBtn = document.getElementById("theme-toggle");
+
+    if (themeToggleBtn) {
+      const newBtn = themeToggleBtn.cloneNode(true);
+      if (themeToggleBtn.parentNode) {
+        themeToggleBtn.parentNode.replaceChild(newBtn, themeToggleBtn);
+      }
+
+      newBtn.addEventListener("click", function () {
+        if (localStorage.getItem("theme")) {
+          if (localStorage.getItem("theme") === "light") {
+            document.documentElement.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+          } else {
+            document.documentElement.classList.remove("dark");
+            localStorage.setItem("theme", "light");
+          }
+        } else {
+          if (document.documentElement.classList.contains("dark")) {
+            document.documentElement.classList.remove("dark");
+            localStorage.setItem("theme", "light");
+          } else {
+            document.documentElement.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+          }
+        }
+      });
+    }
+  }
+
+  setupThemeToggle();
+  document.addEventListener("astro:page-load", setupThemeToggle);
+</script>

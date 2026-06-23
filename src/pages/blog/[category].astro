@@ -1,0 +1,115 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+
+  // Extrair categorias únicas (com fallback para "Geral")
+  const categories = [
+    ...new Set(posts.map((post) => post.data.category || "Geral")),
+  ];
+
+  return categories.map((category) => ({
+    params: { category: category.toLowerCase() },
+    props: {
+      category,
+      posts: posts
+        .filter((post) => (post.data.category || "Geral") === category)
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+    },
+  }));
+}
+
+const { category, posts } = Astro.props;
+---
+
+<BaseLayout
+  title={`${category} | Hub Digital`}
+  description={`Artigos e conteúdos sobre ${category}.`}
+>
+  <div class="pb-12">
+    <div class="mb-12">
+      <a
+        href="/blog"
+        class="inline-block mb-6 text-sm font-bold text-zinc-500 hover:text-brand-primary transition-colors"
+        >← Voltar</a
+      >
+
+      <h1
+        class="text-5xl md:text-7xl font-extrabold tracking-tight mb-4 text-zinc-900 dark:text-brand-text leading-tight"
+      >
+        <span
+          class="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-accent"
+          >{category}</span
+        >
+      </h1>
+      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl">
+        Explorando conteúdos profundos e isolados sobre {category}.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {
+        posts.map((post) => (
+          <a
+            href={`/blog/${(post.data.category || "Geral").toLowerCase()}/${post.id}`}
+            class="group flex flex-col bg-white dark:bg-brand-surface border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-brand-primary/10 transition-all duration-300 hover:-translate-y-1"
+          >
+            {post.data.heroImage && (
+              <div class="w-full aspect-video overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
+                <img
+                  src={post.data.heroImage.src}
+                  alt=""
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+              </div>
+            )}
+            <div class="p-6 flex flex-col flex-grow">
+              <p class="text-sm text-brand-primary font-bold mb-2">
+                <time datetime={post.data.pubDate.toISOString()}>
+                  {post.data.pubDate.toLocaleDateString("pt-BR", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </time>
+              </p>
+              <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-3 group-hover:text-brand-accent transition-colors">
+                {post.data.title}
+              </h3>
+              <p class="text-zinc-600 dark:text-zinc-400 line-clamp-3">
+                {post.data.description}
+              </p>
+
+              <div class="mt-auto pt-6 flex items-center justify-between">
+                <div class="flex gap-2">
+                  {post.data.tags &&
+                    post.data.tags
+                      .slice(0, 2)
+                      .map((tag) => (
+                        <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-500 bg-zinc-100 dark:bg-brand-bg px-2 py-1 rounded-md">
+                          #{tag}
+                        </span>
+                      ))}
+                </div>
+                {post.data.isMonetized && (
+                  <div
+                    class="flex items-center gap-1.5"
+                    title="Conteúdo Monetizado"
+                  >
+                    <span class="w-2 h-2 rounded-full bg-brand-accent animate-pulse" />
+                    <span class="text-[10px] font-bold text-brand-accent uppercase tracking-wider">
+                      Patrocinado
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

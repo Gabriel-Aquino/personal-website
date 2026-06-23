@@ -1,0 +1,51 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="404 - Página não encontrada | Hub Digital"
+  description="Ops, essa página se perdeu."
+  ignoreSearch={true}
+>
+  <div
+    class="flex flex-col items-center justify-center min-h-[65vh] py-20 text-center"
+  >
+    <div class="relative mb-8">
+      <h1
+        class="text-[10rem] md:text-[14rem] font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-brand-primary to-brand-accent tracking-tighter leading-none opacity-20 dark:opacity-30 blur-sm absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      >
+        404
+      </h1>
+      <h1
+        class="text-8xl md:text-[10rem] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-accent tracking-tighter leading-none relative z-10 drop-shadow-2xl"
+      >
+        404
+      </h1>
+    </div>
+
+    <h2
+      class="text-3xl md:text-4xl font-bold text-zinc-900 dark:text-brand-text mb-6 relative z-10"
+    >
+      Página não encontrada
+    </h2>
+    <p class="text-lg text-zinc-600 dark:text-zinc-400 max-w-lg mb-10 relative z-10">
+      Parece que o link que você tentou acessar não existe ou foi movido.
+      Utilize a <button class="open-search font-bold text-brand-primary dark:text-brand-accent hover:underline">Pesquisa Global (Cmd+K)</button> para encontrar o que procura, ou retorne.
+    </p>
+
+    <div class="flex flex-wrap justify-center gap-4 relative z-10">
+      <a
+        href="/"
+        class="px-8 py-3 rounded-xl bg-zinc-900 dark:bg-brand-text text-white dark:text-zinc-900 font-bold hover:bg-brand-primary dark:hover:bg-brand-accent transition-all duration-300 shadow-lg hover:-translate-y-1"
+      >
+        Voltar para a Home
+      </a>
+      <a
+        href="/blog"
+        class="px-8 py-3 rounded-xl border-2 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold hover:border-brand-primary dark:hover:border-brand-accent hover:text-brand-primary dark:hover:text-brand-accent transition-all duration-300 hover:-translate-y-1"
+      >
+        Explorar o Blog
+      </a>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,22 @@
+---
+interface Props {
+  videoId: string; // YouTube video ID
+  title?: string;
+}
+
+const { videoId, title = "YouTube Video" } = Astro.props;
+---
+
+<div
+  class="my-10 w-full rounded-2xl overflow-hidden shadow-xl shadow-black/5 dark:shadow-black/20 border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-brand-surface aspect-video relative not-prose group"
+>
+  <!-- Utilizamos o domínio sem cookies do YouTube para privacidade -->
+  <iframe
+    class="absolute top-0 left-0 w-full h-full opacity-90 group-hover:opacity-100 transition-opacity duration-300"
+    src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=0&rel=0`}
+    title={title}
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+    loading="lazy"></iframe>
+</div>

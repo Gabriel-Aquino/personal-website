@@ -1,0 +1,37 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-bg: #0a0a0a;
+  --color-brand-surface: #171717;
+  --color-brand-primary: #e53935;
+  --color-brand-accent: #d4af37;
+  --color-brand-text: #f3f4f6;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark light;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-atkinson), sans-serif;
+  @apply bg-zinc-50 dark:bg-brand-bg text-zinc-900 dark:text-brand-text transition-colors duration-300;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

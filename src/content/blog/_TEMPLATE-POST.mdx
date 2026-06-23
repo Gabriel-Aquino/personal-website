@@ -1,0 +1,100 @@
+---
+title: "Título Épico do Artigo: Subtítulo Explicativo"
+description: "Uma breve descrição do que o leitor vai aprender neste artigo. Ótimo para SEO."
+pubDate: "2026-06-23"
+category: "Tech"
+tags: ["Astro", "Dicas", "Tutorial"]
+isMonetized: false
+# coverImage: "../../assets/capa.jpg"
+# affiliateLink: "https://seu-link-afiliado.com"
+---
+
+# Título Nível 1 (H1 - Usado apenas uma vez, geralmente é o título do post)
+
+Aqui está um parágrafo introdutório. A ideia deste template é demonstrar **absolutamente todas** as formatações nativas suportadas pelo Markdown e MDX para que você possa apenas copiar e colar quando precisar.
+
+## Título Nível 2 (H2 - Estruturação principal)
+
+Para destacar textos rápidos, você pode usar *itálico*, **negrito**, ***negrito e itálico***, ou até mesmo ~~texto riscado~~. Se quiser citar uma variável de código no meio do texto, use `const variavel = "inline"`.
+
+### Título Nível 3 (H3 - Subseções)
+
+#### Listas Não Ordenadas
+- Arquitetura Clean
+- Performance Custo Zero
+- Design Premium
+  - Sub-item 1
+  - Sub-item 2
+
+#### Listas Ordenadas
+1. Planejar a estrutura
+2. Desenvolver os componentes
+3. Publicar e analisar SEO
+
+#### Checklists (Tarefas)
+- [x] Tarefa concluída
+- [ ] Tarefa pendente
+
+---
+
+## 🖼️ Mídias e Incorporações
+
+### Imagens e GIFs
+As imagens nativas no Markdown são fáceis de adicionar e o Astro cuida da otimização:
+![Exemplo de Placeholder de Imagem](../../assets/blog-placeholder-3.jpg)
+*(Legenda: Placeholder de exemplo do Astro. Gifs também funcionam da mesma maneira, bastando apontar para um arquivo .gif).*
+
+### Vídeos e Iframes (Apenas no MDX)
+Como estamos usando a extensão `.mdx`, você pode injetar tags HTML nativas livremente. Aqui está um exemplo de vídeo do YouTube incorporado:
+
+<iframe 
+  width="100%" 
+  height="400" 
+  src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+  title="YouTube video player" 
+  frameborder="0" 
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+  allowfullscreen
+  class="rounded-xl shadow-lg my-8"
+></iframe>
+
+### Arquivos e Links
+Você pode criar links externos normais, como [visitar meu LinkedIn](https://linkedin.com) ou criar links para **PDFs** se eles estiverem na pasta `public/` do seu projeto: [Baixar Currículo PDF](/resume.pdf).
+
+---
+
+## 💻 Códigos e Citações
+
+Se você precisar destacar um bloco longo de código, a sintaxe de crases fornece _syntax highlighting_ automático:
+
+```typescript
+// Exemplo de bloco de código com Syntax Highlighting
+interface User {
+  id: string;
+  name: string;
+  role: "admin" | "user";
+}
+
+const getUser = async (id: string): Promise<User> => {
+  const res = await fetch(`/api/users/${id}`);
+  return await res.json();
+}
+```
+
+> **Blockquotes (Citações)**
+> O design deve ser invisível. Se o usuário notou a interface, você falhou em tornar a experiência fluida.
+> — *Autor Desconhecido*
+
+---
+
+## 📊 Tabelas de Dados
+
+| Framework | Velocidade (LCP) | Curva de Aprendizado | Ideal para |
+| :--- | :---: | :---: | :--- |
+| **Astro** | ⚡⚡⚡ | Média | Sites estáticos, Blogs |
+| **Next.js** | ⚡⚡ | Alta | Web Apps Complexos |
+| **React** | ⚡ | Média | SPAs |
+
+---
+
+Este é o template base. Para criar um post novo, basta duplicar este arquivo, remover este texto e começar a escrever!
