@@ -63,18 +63,26 @@ import { resume } from "../data/resume";
     </div>
   </section>
 
-  <!-- Skills (Extra Touch) -->
   <section
-    class="py-10 border-y border-zinc-200 dark:border-brand-surface my-10 overflow-hidden"
+    class="py-14 border-y border-zinc-200 dark:border-brand-surface my-10 relative overflow-hidden"
   >
-    <div class="flex flex-wrap gap-4 justify-center items-center">
-      {
-        resume.skills.map((skill) => (
-          <span class="px-5 py-2 bg-zinc-100 dark:bg-brand-surface text-zinc-700 dark:text-brand-text rounded-full font-medium text-sm border border-zinc-200 dark:border-zinc-800 shadow-sm">
-            {skill}
-          </span>
-        ))
-      }
+    <!-- Background Glow -->
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-brand-primary/5 dark:bg-brand-primary/10 blur-[100px] rounded-full pointer-events-none"></div>
+    
+    <div class="max-w-4xl mx-auto px-4">
+      <h2 class="text-3xl font-bold w-full text-center mb-10 text-zinc-900 dark:text-brand-text">
+        Tecnologias e Ferramentas
+      </h2>
+      <div class="flex flex-wrap gap-4 justify-center items-center relative z-10">
+        {
+          resume.skills.map((skill) => (
+            <div class="flex items-center gap-3 px-5 py-3 bg-white dark:bg-brand-surface text-zinc-700 dark:text-brand-text rounded-2xl font-medium text-sm border border-zinc-200 dark:border-zinc-800 shadow-sm hover:-translate-y-1 hover:shadow-brand-primary/20 dark:hover:border-brand-primary/50 transition-all duration-300">
+              <img src={skill.icon} alt={skill.name} class="w-6 h-6 object-contain" />
+              <span>{skill.name}</span>
+            </div>
+          ))
+        }
+      </div>
     </div>
   </section>
 
