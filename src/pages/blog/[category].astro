@@ -7,13 +7,15 @@ import { slugifyCategory } from "../../utils/url";
 export async function getStaticPaths() {
   const categories = await BlogService.getAllCategories();
 
-  return Promise.all(categories.map(async (category) => {
-    const posts = await BlogService.getPostsByCategory(category);
-    return {
-      params: { category: slugifyCategory(category) },
-      props: { category, posts },
-    };
-  }));
+  return Promise.all(
+    categories.map(async (category) => {
+      const posts = await BlogService.getPostsByCategory(category);
+      return {
+        params: { category: slugifyCategory(category) },
+        props: { category, posts },
+      };
+    }),
+  );
 }
 
 const { category, posts } = Astro.props;
@@ -45,9 +47,7 @@ const { category, posts } = Astro.props;
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {
-        posts.map((post) => <BlogCard post={post} />)
-      }
+      {posts.map((post) => <BlogCard post={post} />)}
     </div>
   </div>
 </BaseLayout>

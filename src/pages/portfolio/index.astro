@@ -25,22 +25,33 @@ const projects = await PortfolioService.getAllProjects();
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {
-        projects.map((project) => <ProjectCard project={project} />)
-      }
+      {projects.map((project) => <ProjectCard project={project} />)}
     </div>
 
     {
       projects.length === 0 && (
         <div class="flex flex-col items-center justify-center text-center py-24 bg-white dark:bg-brand-surface rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
           <div class="w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
-            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              />
             </svg>
           </div>
-          <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-2">Em Construção</h3>
+          <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-2">
+            Em Construção
+          </h3>
           <p class="text-zinc-600 dark:text-zinc-400 text-lg max-w-md">
-            Estou preparando estudos de caso e projetos incríveis para compartilhar com você. Volte em breve!
+            Estou preparando estudos de caso e projetos incríveis para
+            compartilhar com você. Volte em breve!
           </p>
         </div>
       )

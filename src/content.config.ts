@@ -11,11 +11,20 @@ const blog = defineCollection({
       // Campos Base
       title: z.string().trim(),
       pubDate: z.coerce.date(),
-      category: z.string().trim().default("Geral").transform((val) => val.charAt(0).toUpperCase() + val.slice(1).toLowerCase()),
+      category: z
+        .string()
+        .trim()
+        .default("Geral")
+        .transform(
+          (val) => val.charAt(0).toUpperCase() + val.slice(1).toLowerCase(),
+        ),
       isMonetized: z.boolean().default(false),
 
       // Campos Secundários / Flexíveis
-      tags: z.array(z.string().trim()).default([]).transform((tags) => tags.map(tag => tag.toLowerCase())),
+      tags: z
+        .array(z.string().trim())
+        .default([])
+        .transform((tags) => tags.map((tag) => tag.toLowerCase())),
       coverImage: z.optional(image()),
       affiliateLink: z.string().url().optional(),
 
@@ -27,7 +36,10 @@ const blog = defineCollection({
 });
 
 const portfolio = defineCollection({
-  loader: glob({ base: "./src/content/portfolio", pattern: "**/[^_]*.{md,mdx}" }),
+  loader: glob({
+    base: "./src/content/portfolio",
+    pattern: "**/[^_]*.{md,mdx}",
+  }),
   schema: ({ image }) =>
     z.object({
       projectName: z.string().trim(),

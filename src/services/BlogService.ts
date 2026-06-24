@@ -7,14 +7,16 @@ export class BlogService {
   static async getAllPosts(): Promise<CollectionEntry<"blog">[]> {
     const posts = await getCollection("blog");
     return posts.sort(
-      (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+      (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
     );
   }
 
   /**
    * Retrieves posts filtered by a specific category.
    */
-  static async getPostsByCategory(category: string): Promise<CollectionEntry<"blog">[]> {
+  static async getPostsByCategory(
+    category: string,
+  ): Promise<CollectionEntry<"blog">[]> {
     const posts = await this.getAllPosts();
     return posts.filter((post) => (post.data.category || "Geral") === category);
   }

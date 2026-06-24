@@ -22,9 +22,9 @@ const { title, description, image, ignoreSearch = false } = Astro.props;
     <!-- Espaço reservado para o script do Google AdSense -->
     <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXX" crossorigin="anonymous"></script> -->
   </head>
-  <body 
+  <body
     class="flex flex-col min-h-screen"
-    {...(ignoreSearch ? { "data-pagefind-ignore": "all" } : {})}
+    {...ignoreSearch ? { "data-pagefind-ignore": "all" } : {}}
   >
     <Header />
     <main

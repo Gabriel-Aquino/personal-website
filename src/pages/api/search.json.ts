@@ -14,7 +14,7 @@ export async function GET() {
       category: post.data.category || "Geral",
       tags: post.data.tags || [],
       url: `/blog/${slugifyCategory(post.data.category || "Geral")}/${post.id}`,
-      type: "Blog"
+      type: "Blog",
     })),
     ...projects.map((project) => ({
       title: project.data.projectName,
@@ -22,13 +22,13 @@ export async function GET() {
       category: "Portfólio",
       tags: project.data.techStack || [],
       url: `/portfolio/${project.id}`,
-      type: "Portfolio"
-    }))
+      type: "Portfolio",
+    })),
   ];
 
   return new Response(JSON.stringify(searchData), {
     headers: {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
 }

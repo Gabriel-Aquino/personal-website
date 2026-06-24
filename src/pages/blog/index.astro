@@ -47,7 +47,9 @@ const categories = await BlogService.getAllCategories();
             {posts
               .filter((post) => (post.data.category || "Geral") === category)
               .slice(0, 3)
-              .map((post) => <BlogCard post={post} />)}
+              .map((post) => (
+                <BlogCard post={post} />
+              ))}
           </div>
         </section>
       ))
@@ -57,13 +59,26 @@ const categories = await BlogService.getAllCategories();
       posts.length === 0 && (
         <div class="flex flex-col items-center justify-center text-center py-24 bg-white dark:bg-brand-surface rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm mt-8">
           <div class="w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
-            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
             </svg>
           </div>
-          <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-2">Nenhum artigo publicado</h3>
+          <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-2">
+            Nenhum artigo publicado
+          </h3>
           <p class="text-zinc-600 dark:text-zinc-400 text-lg max-w-md">
-            Minhas publicações estão no forno. Em breve teremos novidades sobre arquitetura, backend e muito mais.
+            Minhas publicações estão no forno. Em breve teremos novidades sobre
+            arquitetura, backend e muito mais.
           </p>
         </div>
       )

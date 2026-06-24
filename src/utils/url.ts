@@ -4,5 +4,5 @@
  */
 export function slugifyCategory(category: string): string {
   if (!category) return "geral";
-  return category.toLowerCase().replace(/\s+/g, '-');
+  return category.toLowerCase().replace(/\s+/g, "-");
 }
