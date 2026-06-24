@@ -6,7 +6,7 @@ import Comments from "../components/Comments.astro";
 
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description, pubDate, updatedDate, heroImage, category } =
+const { title, description, pubDate, updatedDate, heroImage, category, tags } =
   Astro.props;
 ---
 
@@ -15,17 +15,29 @@ const { title, description, pubDate, updatedDate, heroImage, category } =
     <!-- Header do Artigo -->
     <header class="mb-12 text-center">
       <h1
-        class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-zinc-900 dark:text-brand-text leading-tight"
+        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 text-zinc-900 dark:text-brand-text leading-tight text-balance mx-auto max-w-4xl"
       >
         {title}
       </h1>
 
       {
         category && (
-          <div class="flex flex-wrap justify-center gap-3 mb-8">
+          <div class="flex flex-wrap justify-center gap-3 mb-4">
             <span class="px-4 py-1.5 bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary rounded-full text-sm font-bold border border-brand-primary/20 tracking-wider uppercase">
               {category}
             </span>
+          </div>
+        )
+      }
+
+      {
+        tags && tags.length > 0 && (
+          <div class="flex flex-wrap justify-center gap-2 mb-8">
+            {tags.map((tag) => (
+              <span class="px-3 py-1 bg-brand-accent/10 text-brand-accent border border-brand-accent/20 rounded-full text-xs font-semibold uppercase tracking-wider">
+                #{tag}
+              </span>
+            ))}
           </div>
         )
       }

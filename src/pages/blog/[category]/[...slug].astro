@@ -1,12 +1,15 @@
 ---
-import { type CollectionEntry, getCollection, render } from "astro:content";
+import { render } from "astro:content";
 import BlogPost from "../../../layouts/BlogPost.astro";
+import { BlogService } from "../../../services/BlogService";
+import { slugifyCategory } from "../../../utils/url";
+import type { CollectionEntry } from "astro:content";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog");
+  const posts = await BlogService.getAllPosts();
   return posts.map((post) => ({
     params: {
-      category: (post.data.category || "Geral").toLowerCase(),
+      category: slugifyCategory(post.data.category || "Geral"),
       slug: post.id,
     },
     props: post,

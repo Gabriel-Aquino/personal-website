@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+import { slugifyCategory } from "../utils/url";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const category = post.data.category || "Geral";
+---
+
+<a
+  href={`/blog/${slugifyCategory(category)}/${post.id}`}
+  class="group flex flex-col bg-white dark:bg-brand-surface border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-brand-primary/10 transition-all duration-300 hover:-translate-y-1"
+>
+  {post.data.heroImage && (
+    <div class="w-full aspect-video overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
+      <img
+        src={post.data.heroImage.src}
+        alt=""
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        loading="lazy"
+      />
+    </div>
+  )}
+  <div class="p-6 flex flex-col flex-grow">
+    <p class="text-sm text-brand-primary font-bold mb-2">
+      <FormattedDate date={post.data.pubDate} />
+    </p>
+    <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-3 group-hover:text-brand-accent transition-colors">
+      {post.data.title}
+    </h3>
+    <p class="text-zinc-600 dark:text-zinc-400 line-clamp-3">
+      {post.data.description}
+    </p>
+
+    <div class="mt-auto pt-6 flex items-center justify-between">
+      <div class="flex gap-2">
+        {post.data.tags &&
+          post.data.tags
+            .slice(0, 2)
+            .map((tag) => (
+              <span class="px-3 py-1 bg-brand-accent/10 text-brand-accent border border-brand-accent/20 rounded-full text-xs font-semibold uppercase tracking-wider">
+                #{tag}
+              </span>
+            ))}
+      </div>
+    </div>
+  </div>
+</a>

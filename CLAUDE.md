@@ -25,6 +25,8 @@ O desenvolvedor principal é um Tech Lead com background sólido em ecossistemas
 3.  **Flexibilidade de Schemas:** Os schemas Zod para as Content Collections devem utilizar largamente `z.optional()`. O administrador deve poder adicionar ou remover metadados sem quebrar o build.
 4.  **Renderização Híbrida (MDX):** Componentes React/Astro devem ser desenhados para injeção fluida dentro do Markdown (ex: `<ProductCard />`, `<VideoEmbed />`), isolando a lógica visual do conteúdo em texto.
 5.  **Isolamento de Silos (SEO):** Mantenha o roteamento de categorias estritamente isolado (ex: `/tech/`, `/games/`) para garantir a clareza da indexação do Google e otimizar blocos do AdSense.
+6.  **Clean Architecture e DRY:** O acesso aos dados estáticos (Astro Content Collections) deve ser feito OBRIGATORIAMENTE através da camada de serviço (`src/services/BlogService.ts`, etc). Arquivos de rotas `.astro` não devem chamar `getCollection()` diretamente.
+7.  **Componentização UI:** Lógicas visuais de repetição (como listagens de cards) devem ser isoladas em componentes puros e reutilizáveis em `src/components/`, reduzindo verbosidade nos arquivos de página.
 
 ## Integrações Pessoais
 

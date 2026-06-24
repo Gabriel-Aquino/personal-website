@@ -9,7 +9,6 @@ services:
       - "4321:4321"
     volumes:
       - .:/app
-      # Protegemos o node_modules local para não ser sobrescrito pelo container
       - /app/node_modules
     environment:
       - NODE_ENV=development

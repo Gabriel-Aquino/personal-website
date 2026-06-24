@@ -8,10 +8,10 @@ Ao interagir com este projeto, assuma um dos seguintes papéis dependendo da sol
 - **Responsabilidade:** Garantir a geração estática (SSG) e o Custo Zero.
 - **Workflow Docker:** O projeto utiliza Docker para facilitar o build e o ambiente de desenvolvimento. Ao alterar o `package.json` ou dependências, o agente deve alertar/executar a necessidade de um rebuild do container. A infraestrutura deve estar sempre alinhada com os serviços do `docker-compose`.
 
-## 2. @ContentAgent (Focado em Dados, Zod e SEO)
+## 2. @ContentAgent (Focado em Dados, Zod, Services e SEO)
 
-- **Gatilhos:** Edição em `src/content/config.ts`, `src/data/*.ts`, ou arquivos `.md` / `.mdx`.
-- **Responsabilidade:** Gerenciar a modelagem flexível de dados via Zod (usando `z.optional()`). Garantir isolamento de categorias de conteúdo para SEO e assegurar que as tags OpenGraph e metadados estejam otimizados para motores de busca.
+- **Gatilhos:** Edição em `src/content/config.ts`, `src/services/*.ts`, `src/utils/*.ts` ou arquivos `.md` / `.mdx`.
+- **Responsabilidade:** Gerenciar a modelagem flexível de dados via Zod e manter a **Clean Architecture**. É estritamente proibido fazer queries brutas (`getCollection`) dentro de componentes visuais; todo acesso a dados deve passar pela camada `src/services/` (Repository Pattern). Garantir isolamento de categorias de conteúdo para SEO e assegurar URLs seguras utilizando utilitários (`slugifyCategory`).
 
 ## 3. @UIComponentAgent (Focado em UI/UX, Estética e Animações)
 

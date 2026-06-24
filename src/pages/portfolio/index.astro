@@ -1,8 +1,9 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { PortfolioService } from "../../services/PortfolioService";
 
-const projects = await getCollection("portfolio");
+const projects = await PortfolioService.getAllProjects();
 ---
 
 <BaseLayout
@@ -25,54 +26,21 @@ const projects = await getCollection("portfolio");
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {
-        projects.map((project) => (
-          <a
-            href={`/portfolio/${project.id}`}
-            class="group flex flex-col bg-white dark:bg-brand-surface border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-          >
-            {project.data.coverImage ? (
-              <div class="w-full aspect-video overflow-hidden">
-                <img
-                  src={project.data.coverImage.src}
-                  alt={project.data.projectName}
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
-              </div>
-            ) : (
-              <div class="w-full aspect-video bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-brand-bg dark:to-zinc-900 flex items-center justify-center relative overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-tr from-brand-primary/20 to-brand-accent/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span class="text-zinc-400 dark:text-zinc-600 font-bold text-xl relative z-10">
-                  {project.data.projectName}
-                </span>
-              </div>
-            )}
-
-            <div class="p-6 flex flex-col flex-grow">
-              <h2 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-3 group-hover:text-brand-primary dark:group-hover:text-brand-accent transition-colors">
-                {project.data.projectName}
-              </h2>
-              <div class="flex flex-wrap gap-2 mt-auto">
-                {project.data.techStack.map((tech) => (
-                  <span class="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-brand-text rounded-full text-xs font-semibold border border-zinc-200 dark:border-zinc-700/50">
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </a>
-        ))
+        projects.map((project) => <ProjectCard project={project} />)
       }
     </div>
 
     {
       projects.length === 0 && (
-        <div class="text-center py-20 bg-zinc-50 dark:bg-brand-surface rounded-3xl border border-zinc-200 dark:border-zinc-800">
-          <p class="text-zinc-500 dark:text-zinc-400 text-lg">
-            Nenhum projeto adicionado ainda. Crie arquivos MDX em{" "}
-            <code class="bg-zinc-200 dark:bg-zinc-800 px-2 py-1 rounded">
-              src/content/portfolio/
-            </code>
+        <div class="flex flex-col items-center justify-center text-center py-24 bg-white dark:bg-brand-surface rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+          <div class="w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
+            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-2">Em Construção</h3>
+          <p class="text-zinc-600 dark:text-zinc-400 text-lg max-w-md">
+            Estou preparando estudos de caso e projetos incríveis para compartilhar com você. Volte em breve!
           </p>
         </div>
       )

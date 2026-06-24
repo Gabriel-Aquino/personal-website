@@ -1,178 +1,158 @@
 ---
-import Search from "astro-pagefind/components/Search.astro";
+// src/components/NavbarSearch.astro
 ---
 
-<div class="relative w-40 sm:w-64 md:w-72 lg:w-80 group z-[100]">
-  <div class="navbar-search-theme">
-    <Search id="nav-search" className="pagefind-ui" uiOptions={{ showImages: false }} />
+<div class="relative w-40 sm:w-64 md:w-72 lg:w-80 group z-[100]" id="search-container">
+  <!-- Search Input Trigger -->
+  <div class="relative flex items-center w-full">
+    <svg class="absolute left-3 w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    <input 
+      type="text" 
+      id="search-input"
+      placeholder="Buscar..."
+      class="w-full bg-black/5 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-zinc-100 rounded-lg pl-9 pr-14 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 placeholder:text-zinc-500 cursor-pointer"
+      autocomplete="off"
+    />
+    <div class="absolute right-2 flex items-center">
+      <!-- Hidden by default, updated via JS -->
+      <kbd id="search-shortcut" class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 pointer-events-none">
+        <span id="os-key">⌘</span>K
+      </kbd>
+    </div>
+  </div>
+
+  <!-- Search Results Drawer -->
+  <div id="search-drawer" class="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[70vh] overflow-y-auto bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible transition-all duration-200 origin-top-right transform scale-95 fixed sm:absolute left-4 sm:left-auto">
+    <div class="p-4" id="search-results">
+      <p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">Digite para buscar artigos e projetos...</p>
+    </div>
   </div>
 </div>
 
-<style is:global>
-  /* Premium Navbar Search Theme */
-  .navbar-search-theme {
-    --pagefind-ui-scale: 0.8; /* Smaller for navbar */
-    --pagefind-ui-primary: #E53935;
-    --pagefind-ui-text: #F3F4F6;
-    --pagefind-ui-background: #171717;
-    --pagefind-ui-border: #27272a;
-    --pagefind-ui-tag: #D4AF37;
-    --pagefind-ui-font: inherit;
-  }
-  
-  html:not(.dark) .navbar-search-theme {
-    --pagefind-ui-text: #18181b;
-    --pagefind-ui-background: #ffffff;
-    --pagefind-ui-border: #e4e4e7;
+<script>
+  let searchData = [];
+  let isFetching = false;
+  let isMac = false;
+
+  // We only want to add the global document listeners ONCE.
+  if (typeof window !== 'undefined') {
+    isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    
+    document.addEventListener('keydown', (e) => {
+      const drawer = document.getElementById('search-drawer');
+      const isOpen = drawer && !drawer.classList.contains('opacity-0');
+      
+      if ((isMac ? e.metaKey : e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openSearch();
+      }
+      if (e.key === 'Escape' && isOpen) {
+        closeSearch();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const container = document.getElementById('search-container');
+      const drawer = document.getElementById('search-drawer');
+      const isOpen = drawer && !drawer.classList.contains('opacity-0');
+      
+      if (isOpen && container && !container.contains(e.target as Node)) {
+        closeSearch();
+      }
+    });
   }
 
-  .navbar-search-theme .pagefind-ui {
-    width: 100% !important;
-    position: relative;
-  }
+  // Runs on EVERY page transition to attach local input listeners
+  document.addEventListener('astro:page-load', () => {
+    const input = document.getElementById('search-input') as HTMLInputElement;
+    const shortcutKey = document.getElementById('os-key');
+    
+    if (shortcutKey) shortcutKey.textContent = isMac ? '⌘' : 'Ctrl';
 
-  .navbar-search-theme .pagefind-ui__form {
-    position: relative !important;
-    display: flex !important;
-    width: 100% !important;
-  }
+    if (input) {
+      input.addEventListener('focus', openSearch);
+      input.addEventListener('input', (e) => {
+        const query = (e.target as HTMLInputElement).value.toLowerCase();
+        renderResults(query);
+      });
+    }
+  });
 
-  .navbar-search-theme .pagefind-ui__search-input {
-    width: 100% !important;
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    color: #F3F4F6 !important;
-    border-radius: 0.5rem !important;
-    padding: 0.5rem 0.75rem 0.5rem 2.25rem !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    transition: all 0.2s !important;
-  }
-  
-  html:not(.dark) .navbar-search-theme .pagefind-ui__search-input {
-    background-color: rgba(0, 0, 0, 0.03) !important;
-    border-color: rgba(0, 0, 0, 0.1) !important;
-    color: #18181b !important;
-  }
+  async function openSearch() {
+    const input = document.getElementById('search-input') as HTMLInputElement;
+    const drawer = document.getElementById('search-drawer');
+    const resultsDiv = document.getElementById('search-results');
+    
+    if (!drawer || !input) return;
 
-  .navbar-search-theme .pagefind-ui__search-input:focus {
-    border-color: #E53935 !important;
-    outline: none !important;
-    box-shadow: 0 0 0 2px rgba(229, 57, 53, 0.2) !important;
-    width: 300px !important; /* Expands slightly on focus */
-  }
+    drawer.classList.remove('opacity-0', 'invisible', 'scale-95');
+    drawer.classList.add('opacity-100', 'visible', 'scale-100');
+    input.focus();
 
-  .navbar-search-theme .pagefind-ui__search-clear {
-    position: absolute !important;
-    right: 0.5rem !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    padding: 0 !important;
-    background: transparent !important;
-    color: #a1a1aa !important;
-  }
-
-  /* Dropdown Drawer */
-  .navbar-search-theme .pagefind-ui__drawer {
-    position: absolute !important;
-    top: calc(100% + 0.5rem) !important;
-    right: 0 !important;
-    width: 400px !important;
-    max-height: 70vh !important;
-    overflow-y: auto !important;
-    background-color: #171717 !important;
-    border: 1px solid #27272a !important;
-    border-radius: 0.75rem !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
-    padding: 1rem !important;
-    z-index: 100 !important;
-  }
-  
-  html:not(.dark) .navbar-search-theme .pagefind-ui__drawer {
-    background-color: #ffffff !important;
-    border-color: #e4e4e7 !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
-  }
-
-  .navbar-search-theme .pagefind-ui__hidden {
-    display: none !important;
-  }
-
-  /* Results */
-  .navbar-search-theme .pagefind-ui__result {
-    padding: 0.75rem 0 !important;
-    border-bottom: 1px solid #27272a !important;
-  }
-  html:not(.dark) .navbar-search-theme .pagefind-ui__result { border-bottom-color: #e4e4e7 !important; }
-
-  .navbar-search-theme .pagefind-ui__result-link {
-    color: #F3F4F6 !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    text-decoration: none !important;
-    display: block !important;
-    margin-bottom: 0.25rem !important;
-  }
-  html:not(.dark) .navbar-search-theme .pagefind-ui__result-link { color: #18181b !important; }
-
-  .navbar-search-theme .pagefind-ui__result-link:hover {
-    color: #E53935 !important;
-  }
-
-  .navbar-search-theme .pagefind-ui__result-excerpt {
-    font-size: 0.875rem !important;
-    color: #a1a1aa !important;
-    line-height: 1.5 !important;
-  }
-  html:not(.dark) .navbar-search-theme .pagefind-ui__result-excerpt { color: #52525b !important; }
-
-  .navbar-search-theme .pagefind-ui__result-excerpt mark {
-    background-color: rgba(229, 57, 53, 0.2) !important;
-    color: #E53935 !important;
-    border-radius: 2px !important;
-    padding: 0 0.125rem !important;
-    font-weight: bold !important;
-  }
-
-  .navbar-search-theme .pagefind-ui__message {
-    color: #a1a1aa !important;
-    font-size: 0.875rem !important;
-    padding-bottom: 0.5rem !important;
-  }
-
-  .navbar-search-theme .pagefind-ui__button {
-    width: 100% !important;
-    background-color: transparent !important;
-    border: 1px solid #27272a !important;
-    color: #F3F4F6 !important;
-    border-radius: 0.5rem !important;
-    padding: 0.5rem !important;
-    font-weight: 600 !important;
-    margin-top: 1rem !important;
-    cursor: pointer !important;
-  }
-  html:not(.dark) .navbar-search-theme .pagefind-ui__button {
-    border-color: #e4e4e7 !important;
-    color: #18181b !important;
-  }
-  .navbar-search-theme .pagefind-ui__button:hover {
-    background-color: rgba(229, 57, 53, 0.1) !important;
-    color: #E53935 !important;
-    border-color: #E53935 !important;
-  }
-
-  /* Responsive fixes */
-  @media (max-width: 768px) {
-    .navbar-search-theme .pagefind-ui__drawer {
-      position: fixed !important;
-      top: 4rem !important;
-      left: 0 !important;
-      right: 0 !important;
-      width: 100% !important;
-      max-height: calc(100vh - 4rem) !important;
-      border-radius: 0 !important;
-      border: none !important;
-      border-top: 1px solid #27272a !important;
+    if (searchData.length === 0 && !isFetching) {
+      isFetching = true;
+      if (resultsDiv) resultsDiv.innerHTML = '<div class="flex justify-center py-4"><div class="w-5 h-5 border-2 border-brand-primary border-t-transparent rounded-full animate-spin"></div></div>';
+      
+      try {
+        const res = await fetch('/api/search.json');
+        searchData = await res.json();
+        renderResults(input.value.toLowerCase() || '');
+      } catch (err) {
+        if (resultsDiv) resultsDiv.innerHTML = '<p class="text-sm text-red-500 text-center py-4">Erro ao carregar dados de busca.</p>';
+      } finally {
+        isFetching = false;
+      }
+    } else {
+      renderResults(input.value.toLowerCase() || '');
     }
   }
-</style>
+
+  function closeSearch() {
+    const input = document.getElementById('search-input') as HTMLInputElement;
+    const drawer = document.getElementById('search-drawer');
+    
+    if (!drawer) return;
+    drawer.classList.remove('opacity-100', 'visible', 'scale-100');
+    drawer.classList.add('opacity-0', 'invisible', 'scale-95');
+    if (input) input.blur();
+  }
+
+  function renderResults(query: string) {
+    const resultsDiv = document.getElementById('search-results');
+    if (!resultsDiv) return;
+    
+    if (!query.trim()) {
+      resultsDiv.innerHTML = '<p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">Digite para buscar artigos e projetos...</p>';
+      return;
+    }
+
+    const filtered = searchData.filter((item: any) => 
+      item.title.toLowerCase().includes(query) || 
+      item.description.toLowerCase().includes(query) ||
+      item.tags.some((tag: string) => tag.toLowerCase().includes(query))
+    );
+
+    if (filtered.length === 0) {
+      resultsDiv.innerHTML = '<p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">Nenhum resultado encontrado.</p>';
+      return;
+    }
+
+    resultsDiv.innerHTML = filtered.map((item: any) => `
+      <a href="${item.url}" class="block py-3 px-2 border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors group">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-[10px] uppercase font-bold tracking-wider text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">${item.type}</span>
+          <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-primary transition-colors">${highlight(item.title, query)}</h4>
+        </div>
+        <p class="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1">${item.description}</p>
+      </a>
+    `).join('');
+  }
+
+  function highlight(text: string, query: string) {
+    if (!query) return text;
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<mark class="bg-brand-primary/20 text-brand-primary rounded px-0.5">$1</mark>');
+  }
+</script>

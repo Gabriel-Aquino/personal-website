@@ -1,10 +1,11 @@
 ---
-import { getCollection, render } from "astro:content";
+import { render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Comments from "../../components/Comments.astro";
+import { PortfolioService } from "../../services/PortfolioService";
 
 export async function getStaticPaths() {
-  const projects = await getCollection("portfolio");
+  const projects = await PortfolioService.getAllProjects();
   return projects.map((project) => ({
     params: { slug: project.id },
     props: { project },

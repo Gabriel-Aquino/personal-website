@@ -1,15 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import BlogCard from "../../components/BlogCard.astro";
+import { BlogService } from "../../services/BlogService";
+import { slugifyCategory } from "../../utils/url";
 
-const posts = (await getCollection("blog")).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
-
-// Agrupando por categoria - Fallback para 'Geral' se não tiver categoria
-const categories = [
-  ...new Set(posts.map((post) => post.data.category || "Geral")),
-];
+const posts = await BlogService.getAllPosts();
+const categories = await BlogService.getAllCategories();
 ---
 
 <BaseLayout
@@ -40,7 +36,7 @@ const categories = [
             </h2>
             <div class="h-px bg-zinc-200 dark:bg-brand-surface flex-grow" />
             <a
-              href={`/blog/${category.toLowerCase()}`}
+              href={`/blog/${slugifyCategory(category)}`}
               class="text-sm font-bold text-brand-accent hover:text-brand-primary transition-colors"
             >
               Ver todos →
@@ -51,67 +47,26 @@ const categories = [
             {posts
               .filter((post) => (post.data.category || "Geral") === category)
               .slice(0, 3)
-              .map((post) => (
-                <a
-                  href={`/blog/${(post.data.category || "Geral").toLowerCase()}/${post.id}`}
-                  class="group flex flex-col bg-white dark:bg-brand-surface border border-zinc-200 dark:border-zinc-800 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-brand-primary/10 transition-all duration-300 hover:-translate-y-1"
-                >
-                  {post.data.heroImage && (
-                    <div class="w-full aspect-video overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-                      <img
-                        src={post.data.heroImage.src}
-                        alt=""
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
-                  <div class="p-6 flex flex-col flex-grow">
-                    <p class="text-sm text-brand-primary font-bold mb-2">
-                      <time datetime={post.data.pubDate.toISOString()}>
-                        {post.data.pubDate.toLocaleDateString("pt-BR", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </time>
-                    </p>
-                    <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-3 group-hover:text-brand-accent transition-colors">
-                      {post.data.title}
-                    </h3>
-                    <p class="text-zinc-600 dark:text-zinc-400 line-clamp-3">
-                      {post.data.description}
-                    </p>
-
-                    <div class="mt-auto pt-6 flex items-center justify-between">
-                      <div class="flex gap-2">
-                        {post.data.tags &&
-                          post.data.tags
-                            .slice(0, 2)
-                            .map((tag) => (
-                              <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-500 bg-zinc-100 dark:bg-brand-bg px-2 py-1 rounded-md">
-                                #{tag}
-                              </span>
-                            ))}
-                      </div>
-                      {post.data.isMonetized && (
-                        <div
-                          class="flex items-center gap-1.5"
-                          title="Conteúdo Monetizado"
-                        >
-                          <span class="w-2 h-2 rounded-full bg-brand-accent animate-pulse" />
-                          <span class="text-[10px] font-bold text-brand-accent uppercase tracking-wider">
-                            Patrocinado
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </a>
-              ))}
+              .map((post) => <BlogCard post={post} />)}
           </div>
         </section>
       ))
+    }
+
+    {
+      posts.length === 0 && (
+        <div class="flex flex-col items-center justify-center text-center py-24 bg-white dark:bg-brand-surface rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm mt-8">
+          <div class="w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
+            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text mb-2">Nenhum artigo publicado</h3>
+          <p class="text-zinc-600 dark:text-zinc-400 text-lg max-w-md">
+            Minhas publicações estão no forno. Em breve teremos novidades sobre arquitetura, backend e muito mais.
+          </p>
+        </div>
+      )
     }
   </div>
 </BaseLayout>
