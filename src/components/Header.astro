@@ -118,11 +118,13 @@ import { resume } from "../data/resume";
 
     if (!btn || !menu) return;
 
-    btn.addEventListener("click", () => {
+    // Use onclick instead of addEventListener to prevent stacking multiple 
+    // listeners when Astro View Transitions preserves the DOM node
+    btn.onclick = () => {
       menu.classList.toggle("hidden");
       iconOpen?.classList.toggle("hidden");
       iconClose?.classList.toggle("hidden");
-    });
+    };
   }
 
   // Support Astro View Transitions
