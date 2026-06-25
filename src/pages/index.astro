@@ -340,14 +340,8 @@ const categories = await BlogService.getAllCategories();
     updatePosts();
   };
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initFilters);
-  } else {
-    initFilters();
-  }
-
-  window.addEventListener("pageshow", (event) => {
-    if (event.persisted) {
+  document.addEventListener("astro:page-load", () => {
+    if (document.getElementById("posts-container")) {
       initFilters();
     }
   });
