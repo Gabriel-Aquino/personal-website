@@ -28,4 +28,40 @@ export class BlogService {
     const posts = await this.getAllPosts();
     return [...new Set(posts.map((post) => post.data.category || "Geral"))];
   }
+
+  /**
+   * Retrieves all featured posts.
+   */
+  static async getFeaturedPosts(): Promise<CollectionEntry<"blog">[]> {
+    const posts = await this.getAllPosts();
+    return posts.filter((post) => post.data.featured);
+  }
+
+  /**
+   * Retrieves posts filtered by a specific tag.
+   */
+  static async getPostsByTag(tag: string): Promise<CollectionEntry<"blog">[]> {
+    const posts = await this.getAllPosts();
+    return posts.filter((post) =>
+      post.data.tags?.some((t) => t.toLowerCase() === tag.toLowerCase()),
+    );
+  }
+
+  /**
+   * Retrieves all unique tags available in the blog, sorted by frequency of use.
+   */
+  static async getAllTags(): Promise<string[]> {
+    const posts = await this.getAllPosts();
+    const tags = posts.flatMap((post) => post.data.tags || []);
+    const normalizedTags = tags.map((tag) => tag.toLowerCase());
+
+    const frequencies: Record<string, number> = {};
+    for (const tag of normalizedTags) {
+      frequencies[tag] = (frequencies[tag] || 0) + 1;
+    }
+
+    return Object.keys(frequencies).sort(
+      (a, b) => frequencies[b] - frequencies[a],
+    );
+  }
 }

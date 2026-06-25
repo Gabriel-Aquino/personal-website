@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
 
 interface Props {
   project: CollectionEntry<"portfolio">;
@@ -15,8 +16,8 @@ const { project } = Astro.props;
   {
     project.data.coverImage && (
       <div class="w-full aspect-video overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-        <img
-          src={project.data.coverImage.src}
+        <Image
+          src={project.data.coverImage}
           alt={project.data.projectName}
           class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"

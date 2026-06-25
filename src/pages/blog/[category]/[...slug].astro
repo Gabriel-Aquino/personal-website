@@ -4,6 +4,7 @@ import BlogPost from "../../../layouts/BlogPost.astro";
 import { BlogService } from "../../../services/BlogService";
 import { slugifyCategory } from "../../../utils/url";
 import type { CollectionEntry } from "astro:content";
+import ProductCard from "../../../components/mdx/ProductCard.astro";
 
 export async function getStaticPaths() {
   const posts = await BlogService.getAllPosts();
@@ -18,9 +19,11 @@ export async function getStaticPaths() {
 type Props = CollectionEntry<"blog">;
 
 const post = Astro.props;
+Astro.locals.affiliateProducts = post.data.affiliateProducts;
+
 const { Content } = await render(post);
 ---
 
 <BlogPost {...post.data}>
-  <Content />
+  <Content components={{ ProductCard }} />
 </BlogPost>

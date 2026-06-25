@@ -6,8 +6,17 @@ import Comments from "../components/Comments.astro";
 
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description, pubDate, updatedDate, heroImage, category, tags } =
-  Astro.props;
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  heroImage,
+  category,
+  tags,
+  isMonetized,
+  affiliateLink,
+} = Astro.props;
 ---
 
 <BaseLayout title={title} description={description as string}>
@@ -81,6 +90,21 @@ const { title, description, pubDate, updatedDate, heroImage, category, tags } =
     >
       <slot />
     </div>
+
+    <!-- Monetization / Transparency Disclaimer -->
+    {
+      (isMonetized || affiliateLink) && (
+        <div class="max-w-none w-full mx-auto mt-12 bg-brand-primary/5 dark:bg-brand-primary/10 border border-brand-primary/20 rounded-xl p-5 flex gap-4 items-center text-sm text-zinc-700 dark:text-zinc-300">
+          <span class="text-2xl leading-none pt-0.5">🤝</span>
+          <p class="leading-relaxed mb-0">
+            <strong>Gostou de algum produto citado?</strong> Considere
+            adquiri-los através dos links disponíveis nesta página para apoiar o
+            meu trabalho. Você não paga nada a mais por isso e me ajuda a
+            continuar produzindo conteúdos de qualidade!
+          </p>
+        </div>
+      )
+    }
 
     <!-- Comentários -->
     <Comments />

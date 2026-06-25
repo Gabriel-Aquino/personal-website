@@ -45,7 +45,7 @@
   >
     <div class="p-4" id="search-results">
       <p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">
-        Digite para buscar artigos e projetos...
+        Digite para buscar postagens e projetos...
       </p>
     </div>
   </div>
@@ -157,7 +157,7 @@
 
     if (!query.trim()) {
       resultsDiv.innerHTML =
-        '<p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">Digite para buscar artigos e projetos...</p>';
+        '<p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">Digite para buscar postagens e projetos...</p>';
       return;
     }
 
@@ -177,16 +177,29 @@
     resultsDiv.innerHTML = filtered
       .map(
         (item: SearchItem) => `
-      <a href="${item.url}" class="block py-3 px-2 border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors group">
+      <a href="${escapeHTML(item.url)}" class="block py-3 px-2 border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors group">
         <div class="flex items-center gap-2 mb-1">
-          <span class="text-[10px] uppercase font-bold tracking-wider text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">${item.type}</span>
-          <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-primary transition-colors">${highlight(item.title, query)}</h4>
+          <span class="text-[10px] uppercase font-bold tracking-wider text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">${escapeHTML(item.type)}</span>
+          <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-primary transition-colors">${highlight(escapeHTML(item.title), query)}</h4>
         </div>
-        <p class="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1">${item.description}</p>
+        <p class="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1">${escapeHTML(item.description)}</p>
       </a>
     `,
       )
       .join("");
+  }
+
+  function escapeHTML(str: string) {
+    if (!str) return "";
+    return str.replace(/[&<>'"]/g, 
+      tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+    );
   }
 
   function highlight(text: string, query: string) {

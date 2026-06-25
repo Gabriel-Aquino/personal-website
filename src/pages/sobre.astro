@@ -1,0 +1,111 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { resume } from "../data/resume";
+---
+
+<BaseLayout
+  title="Sobre | Gabriel Aquino"
+  description="Um pouco sobre minha jornada e visão como Engenheiro de Software."
+>
+  <div class="max-w-3xl mx-auto py-8 md:py-12">
+    <header class="mb-12">
+      <h1
+        class="text-4xl md:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 mb-4"
+      >
+        Sobre
+      </h1>
+      <p
+        class="text-sm text-zinc-500 dark:text-zinc-400 font-medium flex items-center gap-2"
+      >
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          ><path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+          ></path></svg
+        >
+        Atualizado recentemente
+      </p>
+    </header>
+
+    <div
+      class="prose prose-zinc dark:prose-invert prose-lg max-w-none text-zinc-700 dark:text-zinc-300"
+    >
+      <p>Eu sou um engenheiro de software.</p>
+
+      <p>
+        Não interessa o que eu esteja fazendo (e fiz várias coisas nos últimos 8
+        anos, desde consertar infraestrutura de rede até arquitetar ecossistemas
+        B2B de viagens), eu sempre vou fazer isto com a visão de um engenheiro:
+        analisando a tarefa com calma, quebrando um problema grande em partes
+        menores, pensando em como otimizar o resultado e escalar de forma
+        sustentável.
+      </p>
+
+      <p>
+        Considero o desenvolvimento de software como uma forma de arte, e estou
+        sempre procurando melhorar como profissional.
+      </p>
+
+      <p>
+        Passei os últimos anos estudando e aplicando novas arquiteturas de
+        software (<strong>Clean Architecture</strong> e <strong>DDD</strong> são minhas
+        favoritas no momento), aprofundando minha proficiência técnica em linguagens
+        robustas (especialmente Node.js, Java e Go), fazendo deploys para a nuvem
+        (AWS e mensageria distribuída) e garantindo alta disponibilidade para arquiteturas
+        SaaS Multi-Tenant.
+      </p>
+
+      <p>
+        Mas nem só de código vive o homem. Nas horas vagas, sou fã assumido de <strong
+          >One Piece</strong
+        > 🏴‍☠️.
+      </p>
+
+      <div
+        class="my-10 border-l-4 border-brand-primary pl-6 py-2 bg-zinc-50 dark:bg-zinc-900/50 rounded-r-lg"
+      >
+        <ul class="list-none pl-0 space-y-2 m-0 text-base font-medium">
+          <li>🎓 Estudando tecnologia desde sempre</li>
+          <li>💻 Profissional de TI desde 2018</li>
+          <li>🚀 Software Engineer Pleno na Paketá</li>
+        </ul>
+      </div>
+
+      <hr class="my-12 border-zinc-200 dark:border-zinc-800" />
+
+      <h3 class="text-2xl font-bold mb-2">Jornada Profissional</h3>
+      <p class="text-base text-zinc-500 mb-8">
+        Um breve histórico das trincheiras por onde passei.
+      </p>
+
+      <div class="not-prose space-y-6">
+        {
+          resume.experience.map((xp) => (
+            <div class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4">
+              <span class="text-sm font-mono text-zinc-400 dark:text-zinc-500 sm:w-40 shrink-0">
+                {xp.period}
+              </span>
+              <div>
+                <span class="font-bold text-zinc-900 dark:text-zinc-100">
+                  {xp.company}
+                </span>
+                <span class="text-zinc-500 dark:text-zinc-400 mx-2 hidden sm:inline">
+                  —
+                </span>
+                <span class="text-sm sm:text-base text-zinc-600 dark:text-zinc-300 block sm:inline">
+                  {xp.role.split(" (")[0]}
+                </span>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</BaseLayout>

@@ -1,0 +1,87 @@
+---
+import { Image } from "astro:assets";
+import { slugifyCategory } from "../utils/url";
+import FormattedDate from "./FormattedDate.astro";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+  isHero?: boolean;
+  withDataAttributes?: boolean;
+}
+
+const { post, isHero = false, withDataAttributes = false } = Astro.props;
+const category = post.data.category || "Geral";
+const tags = post.data.tags ? post.data.tags.join(",") : "";
+---
+
+<article
+  class={`post-card group relative flex flex-col justify-between p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-brand-surface shadow-sm hover:shadow-md transition-shadow h-full ${isHero ? "md:col-span-2 lg:col-span-3" : ""}`}
+  data-category={withDataAttributes ? category : undefined}
+  data-tags={withDataAttributes ? tags : undefined}
+>
+  <div class="flex-1 flex flex-col">
+    {
+      post.data.coverImage && (
+        <div
+          class={`img-container ${isHero ? "aspect-video lg:aspect-[21/7]" : "aspect-video"} w-full mb-6 overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800 transition-all`}
+        >
+          <Image
+            src={post.data.coverImage}
+            alt={post.data.title}
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+      )
+    }
+    <div class="flex items-center gap-3 text-sm text-zinc-500 dark:text-zinc-400 mb-4 font-medium">
+      <FormattedDate date={post.data.pubDate} />
+      {
+        post.data.category && (
+          <>
+            <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+            <span class="uppercase tracking-wider text-[10px] font-bold text-brand-accent px-2 py-0.5 bg-brand-accent/10 border border-brand-accent/20 rounded-full">
+              {post.data.category}
+            </span>
+          </>
+        )
+      }
+    </div>
+
+    <h3
+      class={`post-title ${isHero ? "text-2xl md:text-4xl" : "text-xl"} font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-primary transition-colors line-clamp-2`}
+    >
+      <a href={`/blog/${slugifyCategory(category)}/${post.id}`}>
+        <span class="absolute inset-0 z-20" />
+        {post.data.title}
+      </a>
+    </h3>
+
+    {
+      post.data.description && (
+        <p
+          class={`post-desc mt-4 text-zinc-600 dark:text-zinc-400 leading-relaxed ${isHero ? "text-base md:text-lg line-clamp-3" : "text-sm line-clamp-3"} transition-all`}
+        >
+          {post.data.description}
+        </p>
+      )
+    }
+  </div>
+
+  <div class="mt-6 flex items-center text-sm font-bold text-brand-primary group-hover:text-brand-accent transition-colors">
+    Ler artigo
+    <svg
+      class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M9 5l7 7-7 7"
+      />
+    </svg>
+  </div>
+</article>

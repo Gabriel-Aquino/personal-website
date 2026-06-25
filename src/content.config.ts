@@ -19,6 +19,7 @@ const blog = defineCollection({
           (val) => val.charAt(0).toUpperCase() + val.slice(1).toLowerCase(),
         ),
       isMonetized: z.boolean().default(false),
+      featured: z.boolean().default(false),
 
       // Campos Secundários / Flexíveis
       tags: z
@@ -27,6 +28,18 @@ const blog = defineCollection({
         .transform((tags) => tags.map((tag) => tag.toLowerCase())),
       coverImage: z.optional(image()),
       affiliateLink: z.string().url().optional(),
+      affiliateProducts: z
+        .array(
+          z.object({
+            title: z.string().trim(),
+            description: z.string().trim(),
+            imageUrl: z.string().url(),
+            link: z.string().url(),
+            price: z.string().optional(),
+            badge: z.string().optional(),
+          })
+        )
+        .optional(),
 
       // Campos mantidos do template original para compatibilidade retroativa (opcionais)
       description: z.string().trim().optional(),
@@ -48,6 +61,9 @@ const portfolio = defineCollection({
       githubUrl: z.string().url().optional(),
       liveUrl: z.string().url().optional(),
       coverImage: z.optional(image()),
+      featured: z.boolean().default(false),
+      isMonetized: z.boolean().default(false),
+      affiliateLink: z.string().url().optional(),
     }),
 });
 

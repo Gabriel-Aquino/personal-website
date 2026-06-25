@@ -1,15 +1,42 @@
 ---
 interface Props {
-  title: string;
-  description: string;
-  imageUrl: string;
-  affiliateLink: string;
+  index?: number;
+  title?: string;
+  description?: string;
+  imageUrl?: string;
+  affiliateLink?: string;
   price?: string;
   badge?: string;
 }
 
-const { title, description, imageUrl, affiliateLink, price, badge } =
-  Astro.props;
+const { index } = Astro.props;
+
+let affiliate: Partial<Props> | null = null;
+
+// Try to find the product from the frontmatter array using index
+if (!affiliate && typeof index === "number" && Astro.locals.affiliateProducts) {
+  const frontmatterProduct = Astro.locals.affiliateProducts[index];
+  if (frontmatterProduct) {
+    affiliate = {
+      ...frontmatterProduct,
+      affiliateLink: frontmatterProduct.link, // map 'link' from frontmatter to 'affiliateLink'
+    } as Partial<Props>;
+  }
+}
+
+// Fallback to empty object if nothing is found
+if (!affiliate) {
+  affiliate = {};
+}
+
+// Merge props with JSON data, preferring explicitly passed props
+const title = Astro.props.title || affiliate?.title || "Produto não encontrado";
+const description = Astro.props.description || affiliate?.description || "";
+const imageUrl = Astro.props.imageUrl || affiliate?.imageUrl || "";
+const affiliateLink =
+  Astro.props.affiliateLink || affiliate?.affiliateLink || "#";
+const price = Astro.props.price || affiliate?.price;
+const badge = Astro.props.badge || affiliate?.badge;
 ---
 
 <div

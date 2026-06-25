@@ -1,400 +1,371 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { BlogService } from "../services/BlogService";
+import { PortfolioService } from "../services/PortfolioService";
 import { resume } from "../data/resume";
+import { Image } from "astro:assets";
+import PostCard from "../components/PostCard.astro";
+
+const posts = await BlogService.getAllPosts();
+const tags = await BlogService.getAllTags();
+const featuredPosts = await BlogService.getFeaturedPosts();
+const featuredProjects = await PortfolioService.getFeaturedProjects();
+const categories = await BlogService.getAllCategories();
 ---
 
-<BaseLayout title="Gabriel Aquino | Hub Digital" description={resume.bio}>
-  <!-- Hero Section -->
-  <section
-    class="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-12 py-4 md:py-10"
-  >
-    <div class="flex-1 w-full space-y-4 md:space-y-8 min-w-0">
-      <!-- Wrapper for Mobile: Title + Image Side by Side -->
-      <div class="flex flex-row justify-between items-center gap-4 w-full">
-        <h1
-          class="text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight break-words flex-1"
-        >
-          Olá, eu sou <br class="hidden md:block" />
-          <span
-            class="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-accent block mt-1 md:inline md:mt-0"
-          >
-            {resume.name}
-          </span> 👋
-        </h1>
-
-        <!-- Mobile Image -->
-        <div
-          class="w-24 h-24 sm:w-32 sm:h-32 relative group shrink-0 md:hidden"
-        >
-          <div
-            class="absolute inset-0 bg-gradient-to-tr from-brand-primary to-brand-accent rounded-full blur-xl opacity-40 group-hover:opacity-70 transition-opacity duration-700"
-          >
-          </div>
-          <img
-            src="https://github.com/Gabriel-Aquino.png"
-            alt={resume.name}
-            class="relative w-full h-full object-cover rounded-full border-2 border-white dark:border-brand-bg shadow-xl"
-          />
-        </div>
-      </div>
-
-      <!-- Role, Bio and Buttons -->
-      <div class="space-y-4 md:space-y-8">
-        <p
-          class="text-base sm:text-lg md:text-2xl text-zinc-800 dark:text-brand-text font-semibold"
-        >
-          {resume.role}
-        </p>
-        <p
-          class="text-sm sm:text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed md:max-w-2xl"
-        >
-          {resume.bio}
-        </p>
-
-        <div class="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">
-          <a
-            href={resume.socials.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex-1 md:flex-none px-4 md:px-8 py-2.5 md:py-3.5 bg-zinc-900 text-zinc-50 dark:bg-brand-surface dark:text-brand-text dark:border dark:border-zinc-800 font-bold rounded-xl text-sm md:text-base text-center hover:scale-105 transition-transform duration-300 shadow-xl shadow-zinc-900/20 dark:shadow-none"
-          >
-            GitHub
-          </a>
-          <a
-            href={resume.socials.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex-1 md:flex-none px-4 md:px-8 py-2.5 md:py-3.5 bg-brand-primary text-white font-bold rounded-xl text-sm md:text-base text-center hover:scale-105 transition-transform duration-300 shadow-xl shadow-brand-primary/30"
-          >
-            LinkedIn
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Desktop Image -->
-    <div class="hidden md:block w-96 h-96 relative group shrink-0">
-      <div
-        class="absolute inset-0 bg-gradient-to-tr from-brand-primary to-brand-accent rounded-full blur-3xl opacity-40 group-hover:opacity-70 transition-opacity duration-700"
+<BaseLayout title={resume.name} description={resume.bio}>
+  <div class="max-w-7xl px-4 lg:px-8 mx-auto py-8 md:py-12">
+    <!-- Minimalist Intro -->
+    <header class="mb-16 space-y-4 max-w-3xl">
+      <h1
+        class="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100"
       >
-      </div>
-      <img
-        src="https://github.com/Gabriel-Aquino.png"
-        alt={resume.name}
-        class="relative w-full h-full object-cover rounded-full border-4 border-white dark:border-brand-bg shadow-2xl"
-      />
-    </div>
-  </section>
-
-  <section
-    class="py-14 border-y border-zinc-200 dark:border-brand-surface my-10 relative overflow-hidden"
-  >
-    <!-- Background Glow -->
-    <div
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-brand-primary/5 dark:bg-brand-primary/10 blur-[100px] rounded-full pointer-events-none"
-    >
-    </div>
-
-    <div class="max-w-4xl mx-auto px-4">
-      <h2
-        class="text-3xl font-bold w-full text-center mb-10 text-zinc-900 dark:text-brand-text"
+        Sou Gabriel Aquino, bem vindo ao meu blog!
+      </h1>
+      <p
+        class="text-lg md:text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed"
       >
-        Tecnologias e Ferramentas
-      </h2>
-      <div
-        class="relative flex overflow-hidden w-full group mask-image-fade py-4 z-10"
-      >
-        <div
-          class="flex animate-marquee hover:[animation-play-state:paused] whitespace-nowrap min-w-max"
-        >
-          {
-            [...resume.skills, ...resume.skills].map((skill) => (
-              <div class="flex items-center gap-3 px-6 py-3.5 mx-2 bg-white dark:bg-brand-surface text-zinc-700 dark:text-brand-text rounded-2xl font-semibold text-sm border border-zinc-200 dark:border-zinc-800 shadow-sm hover:-translate-y-1 hover:shadow-brand-primary/20 dark:hover:border-brand-primary/50 transition-all duration-300">
-                {skill.icon && (
-                  <img
-                    src={skill.icon}
-                    alt={skill.name}
-                    class="w-6 h-6 object-contain"
-                  />
-                )}
-                <span>{skill.name}</span>
+        Software Engineer Pleno com 8+ anos de evolução técnica. Escrevo sobre
+        arquitetura, desenvolvimento backend e ecossistemas escaláveis.
+      </p>
+    </header>
+
+    <section>
+      <!-- Featured Section -->
+      {
+        (featuredPosts.length > 0 || featuredProjects.length > 0) && (
+          <div class="mb-16">
+            <h2 class="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6 border-b border-zinc-200 dark:border-zinc-800 pb-4 flex items-center gap-2">
+              <svg
+                class="w-6 h-6 text-brand-primary"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              Destaques
+            </h2>
+
+            {featuredProjects.length > 0 && (
+              <div class="mb-10">
+                <h3 class="text-lg font-bold text-zinc-700 dark:text-zinc-300 mb-4">
+                  Projetos em Destaque
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {featuredProjects.map((project) => (
+                    <article class="group relative flex flex-col justify-between p-5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-brand-surface shadow-sm hover:shadow-md transition-shadow h-full">
+                      <div class="flex-1 flex flex-col">
+                        {project.data.coverImage && (
+                          <div class="aspect-video w-full mb-4 overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800">
+                            <Image
+                              src={project.data.coverImage}
+                              alt={project.data.projectName}
+                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          </div>
+                        )}
+
+                        <h3 class="text-base font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-primary transition-colors line-clamp-2">
+                          <a href={`/portfolio/${project.id}`}>
+                            <span class="absolute inset-0 z-20" />
+                            {project.data.projectName}
+                          </a>
+                        </h3>
+                      </div>
+                      <div class="mt-4 flex items-center text-xs font-bold text-brand-primary group-hover:text-brand-accent transition-colors">
+                        Ver projeto
+                        <svg
+                          class="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               </div>
+            )}
+
+            {featuredPosts.length > 0 && (
+              <div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {featuredPosts.map((post) => (
+                    <PostCard post={post} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      }
+
+      <!-- Categories Tabs (Filters) -->
+      <div class="mb-8">
+        <div
+          class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar border-b border-zinc-200 dark:border-zinc-800"
+        >
+          <button
+            data-category="all"
+            class="category-btn pb-3 border-b-2 font-bold whitespace-nowrap px-2 transition-colors text-brand-primary border-brand-primary"
+          >
+            Todos
+          </button>
+          {
+            categories.map((cat) => (
+              <button
+                data-category={cat}
+                class="category-btn pb-3 border-b-2 font-bold whitespace-nowrap px-2 transition-colors border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700"
+              >
+                {cat}
+              </button>
             ))
           }
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Resumo Profissional -->
-  <section class="mb-16">
-    <div class="flex items-center gap-4 mb-12">
-      <h2 class="text-3xl font-bold w-full text-center">Resumo Profissional</h2>
-    </div>
-
-    <div
-      class="bg-white dark:bg-brand-surface p-8 md:p-10 rounded-3xl shadow-xl shadow-zinc-200/20 dark:shadow-none border border-zinc-100 dark:border-zinc-800/80 w-full mx-auto backdrop-blur-sm hover:-translate-y-1 transition-all duration-300 hover:shadow-brand-primary/5 dark:hover:shadow-brand-accent/5"
-    >
-      <p class="text-lg leading-relaxed text-zinc-600 dark:text-zinc-400 mb-8">
-        Engenheiro de Software com um histórico comprovado na construção,
-        sustentação e escala de plataformas B2B e B2C de alta disponibilidade.
-        Com sólida experiência no ecossistema <strong
-          class="text-brand-primary font-semibold">Node.js (TypeScript)</strong
-        >, <strong class="text-brand-primary font-semibold"
-          >Java (Spring Boot)</strong
-        > e <strong class="text-brand-primary font-semibold">Go</strong>, atuo
-        muito além da entrega de código, focando em estabilidade arquitetural,
-        eficiência operacional e redução de custos de infraestrutura.
-      </p>
-
-      <h3 class="text-xl font-bold text-zinc-900 dark:text-brand-text mb-6">
-        Destaques e Impacto
-      </h3>
-      <ul class="space-y-5 text-zinc-600 dark:text-zinc-400">
-        <li
-          class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-brand-accent before:rounded-full"
+      <!-- Tags Filter -->
+      <div class="mb-12">
+        <h3
+          class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-4"
         >
-          <strong class="text-zinc-800 dark:text-zinc-300"
-            >Engenharia e Arquitetura:</strong
-          > Especialista na concepção de sistemas resilientes, atuando com Clean Architecture,
-          SOLID e DDD (Domain-Driven Design). Experiência profunda em SaaS com arquiteturas
-          multi-tenant (isolamento de dados) e integração de sistemas legados complexos.
-        </li>
-        <li
-          class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-brand-accent before:rounded-full"
+          Filtrar por Assunto
+        </h3>
+        <div
+          class="flex flex-nowrap gap-2 overflow-x-auto pb-4 custom-scrollbar"
         >
-          <strong class="text-zinc-800 dark:text-zinc-300"
-            >Cloud e Escalabilidade:</strong
-          > Domínio na orquestração de microsserviços e fluxos assíncronos na AWS
-          (SQS, SNS, Lambda, S3, EC2), garantindo tolerância a falhas em sistemas
-          educacionais, financeiros e de saúde.
-        </li>
-        <li
-          class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-brand-accent before:rounded-full"
-        >
-          <strong class="text-zinc-800 dark:text-zinc-300"
-            >Eficiência e Visão de Negócios:</strong
-          > Histórico de automação de processos operacionais pesados (n8n, motores
-          de OCR), uso estratégico de IA (LLMs/Cursor) para produtividade técnica
-          de times e experiência direta no fechamento e expansão de contratos corporativos
-          B2B.
-        </li>
-        <li
-          class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-2 before:h-2 before:bg-brand-accent before:rounded-full"
-        >
-          <strong class="text-zinc-800 dark:text-zinc-300"
-            >Qualidade e DevOps:</strong
-          > Forte cultura de engenharia de software com automação de testes End-to-End
-          (E2E) via Playwright e implementação de conteinerização (Docker) em ambientes
-          de desenvolvimento.
-        </li>
-      </ul>
-
-      <div
-        class="mt-10 p-6 md:p-8 bg-zinc-50 dark:bg-brand-bg/50 rounded-2xl border border-zinc-200 dark:border-zinc-800/50 flex flex-col gap-4 text-zinc-700 dark:text-zinc-300"
-      >
-        <div class="flex items-start gap-3">
-          <span class="text-xl shrink-0">🎓</span>
-          <p>
-            Formado em <strong class="text-brand-primary"
-              >Sistemas de Informação</strong
-            > pela FACIMP | Wyden e certificado pela Full Cycle em Fundamentos de
-            Arquitetura, DDD e Comunicação entre Sistemas.
-          </p>
-        </div>
-        <div class="flex items-start gap-3">
-          <span class="text-xl shrink-0">🗣️</span>
-          <p>
-            <strong class="text-brand-primary"
-              >Inglês Intermediário/Avançado</strong
-            > focado em comunicação técnica profissional.
-          </p>
+          <button
+            data-tag="all"
+            class="tag-btn uppercase tracking-wider text-[10px] font-bold text-brand-primary px-3 py-1.5 bg-brand-primary/10 border border-brand-primary/20 rounded-full transition-all shadow-sm shrink-0"
+          >
+            Todos
+          </button>
+          {
+            tags.map((tag) => (
+              <button
+                data-tag={tag}
+                class="tag-btn uppercase tracking-wider text-[10px] font-bold text-zinc-600 dark:text-zinc-400 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-full hover:bg-brand-primary hover:text-white dark:hover:bg-brand-primary dark:hover:text-white hover:border-brand-primary dark:hover:border-brand-primary transition-all shadow-sm shrink-0"
+              >
+                {tag}
+              </button>
+            ))
+          }
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Timeline Experiência Profissional -->
-  <section>
-    <div class="flex items-center gap-4 mb-12">
-      <h2 class="text-3xl font-bold w-full text-center">
-        Experiência Profissional
+      <!-- All Posts Section -->
+      <h2
+        class="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6 border-b border-zinc-200 dark:border-zinc-800 pb-4"
+      >
+        Últimas postagens
       </h2>
-    </div>
 
-    <div
-      class="space-y-10 relative before:absolute before:inset-0 before:ml-5 md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-brand-primary/50 before:via-zinc-300 dark:before:via-brand-surface before:to-transparent"
-    >
-      {
-        resume.experience.slice(0, 2).map((exp, index) => (
-          <div class="relative flex items-center md:justify-between w-full group/card">
-            <div class="absolute top-8 left-5 md:left-1/2 -translate-x-1/2 flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-brand-bg bg-gradient-to-br from-brand-primary to-brand-accent text-white shadow-lg z-10 group-hover/card:scale-110 transition-transform duration-300">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fill-rule="evenodd"
-                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-            <div
-              class={`hidden md:block w-[calc(50%-3rem)] ${index % 2 === 0 ? "order-2" : "order-1"}`}
-            />
-            <div
-              class={`w-full ml-16 md:ml-0 md:w-[calc(50%-3rem)] bg-white dark:bg-brand-surface p-8 rounded-3xl shadow-xl shadow-zinc-200/20 dark:shadow-none border border-zinc-100 dark:border-zinc-800/80 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-brand-primary/10 dark:hover:shadow-brand-accent/10 backdrop-blur-sm ${index % 2 === 0 ? "order-1" : "order-2"}`}
-            >
-              <div class="flex flex-col xl:flex-row xl:items-center justify-between mb-4 gap-2">
-                <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text">
-                  {exp.role}
-                </h3>
-                <span class="text-sm text-brand-accent font-bold bg-brand-accent/10 px-4 py-1.5 rounded-full border border-brand-accent/20 shrink-0">
-                  {exp.period}
-                </span>
-              </div>
-              <h4 class="text-lg font-semibold text-brand-primary mb-4 flex items-center gap-2">
-                {exp.company}
-                {exp.location && (
-                  <>
-                    <span class="text-zinc-300 dark:text-zinc-700">|</span>
-                    <span class="text-zinc-500 dark:text-zinc-400 text-sm font-normal">
-                      {exp.location}
-                    </span>
-                  </>
-                )}
-              </h4>
-              <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed text-base">
-                {exp.description}
-              </p>
-              {exp.details && exp.details.length > 0 && (
-                <details class="group/details mt-4">
-                  <summary class="cursor-pointer text-sm font-bold text-brand-accent hover:text-brand-primary transition-colors flex items-center gap-1 select-none w-fit">
-                    <span class="group-open/details:hidden">
-                      Ver Detalhes ↓
-                    </span>
-                    <span class="hidden group-open/details:inline">
-                      Ocultar Detalhes ↑
-                    </span>
-                  </summary>
-                  <ul class="mt-4 space-y-3 text-sm text-zinc-600 dark:text-zinc-400 border-l-2 border-zinc-200 dark:border-zinc-800 pl-4">
-                    {exp.details.map((detail: string) => (
-                      <li class="relative before:content-[''] before:absolute before:-left-[21px] before:top-2 before:w-2 before:h-2 before:bg-brand-primary before:rounded-full">
-                        {detail}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              )}
-              {exp.techStack && exp.techStack.length > 0 && (
-                <div class="mt-6 flex flex-wrap gap-2">
-                  {exp.techStack.map((tech: string) => (
-                    <span class="px-3 py-1 bg-brand-accent/5 text-brand-accent border border-brand-accent/10 rounded-full text-xs font-semibold uppercase tracking-wider">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        ))
-      }
+      <div
+        id="posts-container"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+      >
+        {
+          posts.map((post, index) => {
+            const isHero = index === 0;
+            return (
+              <PostCard post={post} isHero={isHero} withDataAttributes={true} />
+            );
+          })
+        }
+      </div>
 
       {
-        resume.experience.length > 2 && (
-          <details class="group/older mt-10">
-            <summary class="w-full flex justify-center py-6 relative z-20 cursor-pointer list-none [&::-webkit-details-marker]:hidden outline-none">
-              <div class="bg-white dark:bg-brand-surface border-2 border-brand-accent/20 dark:border-zinc-800 text-brand-primary dark:text-brand-text font-bold px-8 py-3.5 rounded-full hover:bg-brand-accent/5 transition-all shadow-lg hover:shadow-brand-accent/20 flex items-center gap-2">
-                <span class="group-open/older:hidden">
-                  Mostrar experiências anteriores ↓
-                </span>
-                <span class="hidden group-open/older:inline">
-                  Ocultar experiências anteriores ↑
-                </span>
-              </div>
-            </summary>
-            <div class="space-y-10 mt-6 relative">
-              {resume.experience.slice(2).map((exp, idx) => {
-                const index = idx + 2;
-                return (
-                  <div class="relative flex items-center md:justify-between w-full group/card">
-                    <div class="absolute top-8 left-5 md:left-1/2 -translate-x-1/2 flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-brand-bg bg-gradient-to-br from-brand-primary to-brand-accent text-white shadow-lg z-10 group-hover/card:scale-110 transition-transform duration-300">
-                      <svg
-                        class="w-4 h-4"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <div
-                      class={`hidden md:block w-[calc(50%-3rem)] ${index % 2 === 0 ? "order-2" : "order-1"}`}
-                    />
-                    <div
-                      class={`w-full ml-16 md:ml-0 md:w-[calc(50%-3rem)] bg-white dark:bg-brand-surface p-8 rounded-3xl shadow-xl shadow-zinc-200/20 dark:shadow-none border border-zinc-100 dark:border-zinc-800/80 hover:-translate-y-1.5 transition-all duration-300 hover:shadow-brand-primary/10 dark:hover:shadow-brand-accent/10 backdrop-blur-sm ${index % 2 === 0 ? "order-1" : "order-2"}`}
-                    >
-                      <div class="flex flex-col xl:flex-row xl:items-center justify-between mb-4 gap-2">
-                        <h3 class="text-2xl font-bold text-zinc-900 dark:text-brand-text">
-                          {exp.role}
-                        </h3>
-                        <span class="text-sm text-brand-accent font-bold bg-brand-accent/10 px-4 py-1.5 rounded-full border border-brand-accent/20 shrink-0">
-                          {exp.period}
-                        </span>
-                      </div>
-                      <h4 class="text-lg font-semibold text-brand-primary mb-4 flex items-center gap-2">
-                        {exp.company}
-                        {exp.location && (
-                          <>
-                            <span class="text-zinc-300 dark:text-zinc-700">
-                              |
-                            </span>
-                            <span class="text-zinc-500 dark:text-zinc-400 text-sm font-normal">
-                              {exp.location}
-                            </span>
-                          </>
-                        )}
-                      </h4>
-                      <p class="text-zinc-600 dark:text-zinc-400 leading-relaxed text-base">
-                        {exp.description}
-                      </p>
-                      {exp.details && exp.details.length > 0 && (
-                        <details class="group/details mt-4">
-                          <summary class="cursor-pointer text-sm font-bold text-brand-accent hover:text-brand-primary transition-colors flex items-center gap-1 select-none w-fit">
-                            <span class="group-open/details:hidden">
-                              Ver Detalhes ↓
-                            </span>
-                            <span class="hidden group-open/details:inline">
-                              Ocultar Detalhes ↑
-                            </span>
-                          </summary>
-                          <ul class="mt-4 space-y-3 text-sm text-zinc-600 dark:text-zinc-400 border-l-2 border-zinc-200 dark:border-zinc-800 pl-4">
-                            {exp.details.map((detail: string) => (
-                              <li class="relative before:content-[''] before:absolute before:-left-[21px] before:top-2 before:w-2 before:h-2 before:bg-brand-primary before:rounded-full">
-                                {detail}
-                              </li>
-                            ))}
-                          </ul>
-                        </details>
-                      )}
-                      {exp.techStack && exp.techStack.length > 0 && (
-                        <div class="mt-6 flex flex-wrap gap-2">
-                          {exp.techStack.map((tech: string) => (
-                            <span class="px-3 py-1 bg-brand-accent/5 text-brand-accent border border-brand-accent/10 rounded-full text-xs font-semibold uppercase tracking-wider">
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </details>
+        posts.length === 0 && (
+          <p class="text-zinc-500 dark:text-zinc-400 italic mt-8">
+            Nenhuma postagem publicada ainda.
+          </p>
         )
       }
-    </div>
-  </section>
+
+      <p
+        id="empty-state"
+        class="hidden text-zinc-500 dark:text-zinc-400 italic mt-8"
+      >
+        Nenhuma postagem encontrada para este filtro.
+      </p>
+    </section>
+  </div>
 </BaseLayout>
+
+<script>
+  const initFilters = () => {
+    const categoryBtns = document.querySelectorAll(".category-btn");
+    const tagBtns = document.querySelectorAll(".tag-btn");
+    const postCards = document.querySelectorAll("#posts-container .post-card");
+    const emptyState = document.getElementById("empty-state");
+
+    let activeCategory = "all";
+    let activeTag = "all";
+
+    function updatePosts() {
+      let firstVisibleFound = false;
+      let visibleCount = 0;
+
+      postCards.forEach((card) => {
+        const cat = card.getAttribute("data-category");
+        const tags = card.getAttribute("data-tags")?.split(",") || [];
+
+        const matchCategory =
+          activeCategory === "all" || cat === activeCategory;
+        const matchTag = activeTag === "all" || tags.includes(activeTag);
+
+        if (matchCategory && matchTag) {
+          (card as HTMLElement).style.display = "flex";
+          visibleCount++;
+
+          // Apply hero styles to the first visible post
+          if (!firstVisibleFound) {
+            card.classList.add("md:col-span-2", "lg:col-span-3");
+            card
+              .querySelector(".img-container")
+              ?.classList.add("lg:aspect-[21/7]");
+            const title = card.querySelector(".post-title");
+            title?.classList.add("text-2xl", "md:text-4xl");
+            title?.classList.remove("text-xl");
+            const desc = card.querySelector(".post-desc");
+            desc?.classList.add("text-base", "md:text-lg");
+            desc?.classList.remove("text-sm");
+            firstVisibleFound = true;
+          } else {
+            // Remove hero styles for subsequent visible posts
+            card.classList.remove("md:col-span-2", "lg:col-span-3");
+            card
+              .querySelector(".img-container")
+              ?.classList.remove("lg:aspect-[21/7]");
+            const title = card.querySelector(".post-title");
+            title?.classList.remove("text-2xl", "md:text-4xl");
+            title?.classList.add("text-xl");
+            const desc = card.querySelector(".post-desc");
+            desc?.classList.remove("text-base", "md:text-lg");
+            desc?.classList.add("text-sm");
+          }
+        } else {
+          (card as HTMLElement).style.display = "none";
+          card.classList.remove("md:col-span-2", "lg:col-span-3");
+        }
+      });
+
+      if (emptyState) {
+        if (visibleCount === 0) {
+          emptyState.classList.remove("hidden");
+        } else {
+          emptyState.classList.add("hidden");
+        }
+      }
+    }
+
+    categoryBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        activeCategory = btn.getAttribute("data-category") || "all";
+
+        // Update button styles
+        categoryBtns.forEach((b) => {
+          b.classList.remove("text-brand-primary", "border-brand-primary");
+          b.classList.add(
+            "border-transparent",
+            "text-zinc-500",
+            "dark:text-zinc-400",
+            "hover:text-zinc-900",
+            "dark:hover:text-zinc-100",
+            "hover:border-zinc-300",
+            "dark:hover:border-zinc-700"
+          );
+        });
+        btn.classList.add("text-brand-primary", "border-brand-primary");
+        btn.classList.remove(
+          "border-transparent",
+          "text-zinc-500",
+          "dark:text-zinc-400",
+          "hover:text-zinc-900",
+          "dark:hover:text-zinc-100",
+          "hover:border-zinc-300",
+          "dark:hover:border-zinc-700"
+        );
+
+        updatePosts();
+      });
+    });
+
+    tagBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        activeTag = btn.getAttribute("data-tag") || "all";
+
+        // Update button styles
+        tagBtns.forEach((b) => {
+          b.classList.remove(
+            "text-brand-primary",
+            "bg-brand-primary/10",
+            "border-brand-primary/20",
+          );
+          b.classList.add(
+            "bg-zinc-100",
+            "dark:bg-zinc-800/50",
+            "text-zinc-600",
+            "dark:text-zinc-400",
+            "border-zinc-200",
+            "dark:border-zinc-700/50",
+          );
+        });
+        btn.classList.add(
+          "text-brand-primary",
+          "bg-brand-primary/10",
+          "border-brand-primary/20",
+        );
+        btn.classList.remove(
+          "bg-zinc-100",
+          "dark:bg-zinc-800/50",
+          "text-zinc-600",
+          "dark:text-zinc-400",
+          "border-zinc-200",
+          "dark:border-zinc-700/50",
+        );
+
+        updatePosts();
+      });
+    });
+
+    // Initial setup
+    updatePosts();
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFilters);
+  } else {
+    initFilters();
+  }
+
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+      initFilters();
+    }
+  });
+</script>
+
+<style>
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #d4d4d8;
+    border-radius: 10px;
+  }
+  :global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #3f3f46;
+  }
+</style>
