@@ -15,13 +15,22 @@ const { project } = Astro.props;
 >
   {
     project.data.coverImage && (
-      <div class="w-full aspect-video overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
-        <Image
-          src={project.data.coverImage}
-          alt={project.data.projectName}
-          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-        />
+      <div class="aspect-video w-full overflow-hidden border-b border-zinc-200 dark:border-zinc-800">
+        {typeof project.data.coverImage === "string" ? (
+          <img
+            src={project.data.coverImage}
+            alt={project.data.projectName}
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+        ) : (
+          <Image
+            src={project.data.coverImage}
+            alt={project.data.projectName}
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+        )}
       </div>
     )
   }

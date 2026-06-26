@@ -26,7 +26,7 @@ const blog = defineCollection({
         .array(z.string().trim())
         .default([])
         .transform((tags) => tags.map((tag) => tag.toLowerCase())),
-      coverImage: z.optional(image()),
+      coverImage: z.union([image(), z.string().url()]).optional(),
       affiliateLink: z.string().url().optional(),
       affiliateProducts: z
         .array(
@@ -60,7 +60,7 @@ const portfolio = defineCollection({
       techStack: z.array(z.string().trim()),
       githubUrl: z.string().url().optional(),
       liveUrl: z.string().url().optional(),
-      coverImage: z.optional(image()),
+      coverImage: z.union([image(), z.string().url()]).optional(),
       featured: z.boolean().default(false),
       isMonetized: z.boolean().default(false),
       affiliateLink: z.string().url().optional(),

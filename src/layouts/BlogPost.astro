@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 import BaseLayout from "./BaseLayout.astro";
 import FormattedDate from "../components/FormattedDate.astro";
 import Comments from "../components/Comments.astro";
+import { Image } from "astro:assets";
 
 type Props = CollectionEntry<"blog">["data"];
 
@@ -72,14 +73,23 @@ const {
     {
       heroImage && (
         <div class="w-full rounded-3xl overflow-hidden shadow-2xl mb-16 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-brand-surface aspect-video">
-          <img
-            src={
-              heroImage.src || (typeof heroImage === "string" ? heroImage : "")
-            }
-            alt={title}
-            class="w-full h-full object-cover"
-            loading="eager"
-          />
+          {typeof heroImage === "string" ? (
+            <img
+              src={heroImage}
+              alt={title}
+              class="w-full h-full object-cover"
+              loading="eager"
+              fetchpriority="high"
+            />
+          ) : (
+            <Image
+              src={heroImage}
+              alt={title}
+              class="w-full h-full object-cover"
+              loading="eager"
+              fetchpriority="high"
+            />
+          )}
         </div>
       )
     }
