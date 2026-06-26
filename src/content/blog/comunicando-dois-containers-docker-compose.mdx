@@ -1,0 +1,168 @@
+---
+title: "Comunicando dois containers com docker-compose"
+description: "Um tutorial simples e direto de como fazer dois containers diferentes conversarem entre si no seu ambiente de desenvolvimento utilizando o docker-compose."
+pubDate: 2026-06-26
+category: "tech"
+coverImage: "https://blog.geekhunter.com.br/wp-content/uploads/2019/06/docker-na-pratica-como-construir-uma-aplicacao-2.png.webp"
+tags: ["docker", "docker-compose", "backend", "infra", "containers"]
+isMonetized: true
+affiliateProducts:
+  - title: "Livro Recomendado: Descomplicando o Docker"
+    description: "Recomendação essencial de leitura para você dominar de vez o ecossistema Docker e parar de sofrer com ambientes de desenvolvimento."
+    imageUrl: "https://m.media-amazon.com/images/I/91DKHUAeZ6L._SY425_.jpg"
+    link: "https://link.amazon/B06qwbiP1"
+    price: "Verifique o Preço"
+    badge: "Recomendação"
+---
+
+Você já deve ter se deparado com a situação de ter que fazer dois containers diferentes conversarem entre si no seu ambiente de desenvolvimento. Eu passei por isso recentemente e decidi criar este pequeno tutorial para mostrar, da forma mais simples possível, como resolver esse problema. Bora pro que interessa!
+
+Para este tutorial, vou partir do princípio que você já tem o Docker instalado na sua máquina e sabe o básico de seus comandos e do docker-compose. Caso ainda não tenha o Docker, você pode instalá-lo seguindo o [link oficial](https://docs.docker.com/get-docker/).
+
+![Docker e Node.js. Fonte: Docker](https://blog.geekhunter.com.br/wp-content/uploads/2019/06/docker-na-pratica-como-construir-uma-aplicacao-2.png.webp)
+
+## Iniciando nosso arquivo docker-compose
+
+Para começarmos, crie uma pasta onde achar melhor. No meu caso, vou criar em `/home/meuusuario/www/meuprojeto`.
+
+Vamos utilizar como exemplo a imagem oficial do Node.js (`node:14.17.6`) e a imagem `vimagick/json-server` (que simula uma API REST rapidinha). Essa API vai consumir um arquivo chamado `db.json`, que vamos criar dentro de uma nova pasta chamada `api`:
+
+```json
+{
+  "clients": [
+    {
+      "id": "59761c23b30d971669fb42ff",
+      "isActive": true,
+      "age": 36,
+      "name": "Monkey D. Luffy",
+      "gender": "male",
+      "company": "One Piece",
+      "email": "luffy@onepiece.com",
+      "phone": "+1 (890) 311-1111",
+      "address": "Vila Foosha, Reino Goa, East Blue, 1015"
+    }
+  ]
+}
+```
+
+## O serviço do json-server
+
+Agora, criamos o arquivo `docker-compose.yml` na raiz do projeto. Começamos configurando o serviço da nossa API fake:
+
+```yml
+version: '3'
+services:
+  json-server:
+    container_name: json-server
+    image: vimagick/json-server
+    command: -H 0.0.0.0 -p 80 -w /api/db.json
+    ports:
+      - "80:80"
+    volumes:
+      - ./api:/api
+    restart: always
+    expose:
+      - 80
+    networks:
+      - my_network
+
+networks:
+  my_network:
+```
+
+> **Aviso:** certifique-se de que não tem nenhum serviço rodando na porta 80 da sua máquina local.
+
+Explicando os comandos principais:
+- **services:** onde definimos os containers que serão criados.
+- **image:** a imagem que o Docker vai baixar do DockerHub.
+- **ports:** mapeia a porta do container para a porta do nosso computador.
+- **volumes:** espelha a pasta do nosso computador para dentro do container.
+- **expose:** expõe a porta para os outros containers que estiverem na mesma rede (o segredo está aqui!).
+- **networks:** criamos uma rede isolada e conectamos nosso container a ela.
+
+## Criando nossa aplicação Node.js
+
+Agora vamos preparar o terreno para o nosso segundo container. Primeiro, crie o arquivo `package.json` na raiz:
+
+```json
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js"
+  }
+}
+```
+
+Em seguida, crie o `index.js`. Como o Axios é assíncrono, vamos usar `async/await` para garantir que o Node espere a resposta da API:
+
+```javascript
+const express = require('express');
+const axios = require('axios');
+const app = express();
+
+app.use(express.json());
+
+app.get('/api/clients', async (req, res) => {
+    try {
+        // O NOME do serviço do outro container vira a nossa URL!
+        const response = await axios.get('http://json-server/clients');
+        res.status(200).json(response.data);
+    } catch (error) {
+        res.status(500).json({ error: 'Falha na comunicação' });
+    }
+});
+
+app.listen(3000, () => {
+    console.log('NodeJS server rodando na porta 3000 🚀');
+});
+```
+
+Para envelopar isso, crie um `Dockerfile` na raiz do projeto:
+
+```dockerfile
+FROM node:14.17.6
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN npm install express axios nodemon
+
+EXPOSE 3000
+```
+
+## Juntando tudo e testando
+
+Agora vamos adicionar o serviço do Node.js no nosso `docker-compose.yml`, logo abaixo do `json-server`:
+
+```yml
+  nodejs:
+    build:
+      context: .
+    container_name: nodejs
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - my_network
+    ports:
+      - "3000:3000"
+    command: npm run dev
+    depends_on:
+      - json-server
+```
+
+Com tudo no lugar, abra o terminal e rode:
+
+```bash
+docker-compose up --build
+```
+
+Acesse `http://localhost:3000/api/clients` no seu navegador. O que aconteceu?
+
+Quando seu container Node fez a requisição para `http://json-server/clients`, o Docker funcionou como um DNS interno. Como ambos os containers estão na rede `my_network`, ele entende que `json-server` é o outro container e faz a ponte direto pela porta 80. Tudo isso sem precisar expor IP de rede local e de forma isolada!
+
+<br />
+<ProductCard index={0} />

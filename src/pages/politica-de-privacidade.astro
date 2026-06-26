@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_TITLE } from "../consts";
+---
+
+<BaseLayout
+  title={`Política de Privacidade | ${SITE_TITLE}`}
+  description="Política de Privacidade e uso de cookies."
+>
+  <div class="max-w-3xl mx-auto prose dark:prose-invert prose-zinc mt-8">
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6">Política de Privacidade</h1>
+    <p class="text-sm text-zinc-500 mb-8">Última atualização: {new Date().toLocaleDateString('pt-BR')}</p>
+
+    <h2>1. Informações Gerais</h2>
+    <p>
+      A sua privacidade é importante para nós. É política do nosso site respeitar a sua privacidade em relação a
+      qualquer informação sua que possamos coletar no site, e outros sites que possuímos e operamos.
+    </p>
+    <p>
+      Solicitamos informações pessoais apenas quando realmente precisamos delas para lhe fornecer um serviço.
+      Fazemo-lo por meios justos e legais, com o seu conhecimento e consentimento. Também informamos por que estamos
+      coletando e como será usado.
+    </p>
+
+    <h2>2. Como utilizamos os seus dados (Cookies e Analytics)</h2>
+    <p>
+      Nós usamos o <strong>Google Analytics 4</strong> para entender como os visitantes interagem com o nosso site.
+      O Analytics coleta dados anônimos de tráfego, ajudando a melhorar a usabilidade e a oferta de conteúdo.
+    </p>
+
+    <h2>3. Publicidade e Google AdSense</h2>
+    <p>
+      Para ajudar a cobrir os custos de manutenção do site, nós exibimos anúncios operados pela rede do
+      <strong>Google AdSense</strong>. A respeito disso:
+    </p>
+    <ul>
+      <li>
+        Fornecedores de terceiros, incluindo o Google, usam cookies para exibir anúncios com base em visitas
+        anteriores do usuário ao nosso ou a outros websites.
+      </li>
+      <li>
+        O uso de cookies de publicidade (incluindo o <strong>cookie DART</strong>) permite que o Google e seus
+        parceiros veiculem anúncios aos usuários com base na visita a este site e/ou a outros sites na Internet.
+      </li>
+      <li>
+        Os usuários podem desativar a publicidade personalizada acessando as
+        <a href="https://myadcenter.google.com/" target="_blank" rel="noopener noreferrer">
+          Configurações de anúncios do Google
+        </a>.
+      </li>
+    </ul>
+
+    <h2>4. Links Externos</h2>
+    <p>
+      O nosso site pode ter links para sites externos que não são operados por nós. Esteja ciente de que não
+      temos controle sobre o conteúdo e práticas desses sites e não podemos aceitar responsabilidade por suas
+      respectivas políticas de privacidade.
+    </p>
+
+    <h2>5. O seu consentimento</h2>
+    <p>
+      O uso continuado de nosso site será considerado como aceitação de nossas práticas em torno de
+      privacidade e informações pessoais.
+    </p>
+
+    <h2>6. Contato</h2>
+    <p>
+      Se você tiver alguma dúvida sobre como lidamos com dados do usuário e informações pessoais, entre em
+      contato através do e-mail:
+      <a href="mailto:gabrielaquinocastelobranco@gmail.com" class="text-brand-primary font-medium hover:underline">
+        gabrielaquinocastelobranco@gmail.com
+      </a>.
+    </p>
+  </div>
+</BaseLayout>

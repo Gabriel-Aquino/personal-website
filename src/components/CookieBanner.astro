@@ -1,0 +1,60 @@
+---
+---
+
+<div
+  id="cookie-banner"
+  class="fixed bottom-0 left-0 w-full z-50 transform translate-y-full transition-transform duration-500 ease-in-out opacity-0"
+>
+  <div
+    class="bg-zinc-900/95 backdrop-blur-md border-t border-brand-surface p-4 shadow-2xl"
+  >
+    <div
+      class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4"
+    >
+      <div class="text-sm text-zinc-300 flex-1 text-center sm:text-left">
+        <p>
+          Utilizamos cookies para oferecer a melhor experiência, analisar o tráfego do site e personalizar anúncios. Ao continuar navegando, você concorda com o uso de cookies. Leia nossa 
+          &nbsp;<a
+            href="/politica-de-privacidade"
+            class="text-brand-primary hover:text-brand-accent transition-colors font-semibold underline"
+          >
+            Política de Privacidade
+          </a>&nbsp;
+           para saber mais.
+        </p>
+      </div>
+      <div class="flex-shrink-0 w-full sm:w-auto">
+        <button
+          id="accept-cookies"
+          class="w-full sm:w-auto px-6 py-2.5 bg-brand-primary hover:bg-brand-accent text-white font-medium rounded-lg transition-all duration-300 shadow-lg shadow-brand-primary/20 active:scale-95"
+        >
+          Entendi e Aceito
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const banner = document.getElementById("cookie-banner");
+    const acceptBtn = document.getElementById("accept-cookies");
+    const cookieConsent = localStorage.getItem("cookie_consent");
+
+    if (!cookieConsent && banner) {
+      // Show the banner with a slight delay for better UX
+      setTimeout(() => {
+        banner.classList.remove("translate-y-full", "opacity-0");
+        banner.classList.add("translate-y-0", "opacity-100");
+      }, 500);
+    }
+
+    if (acceptBtn && banner) {
+      acceptBtn.addEventListener("click", () => {
+        localStorage.setItem("cookie_consent", "true");
+        banner.classList.remove("translate-y-0", "opacity-100");
+        banner.classList.add("translate-y-full", "opacity-0");
+      });
+    }
+  });
+</script>

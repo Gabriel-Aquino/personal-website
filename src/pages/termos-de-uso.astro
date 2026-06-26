@@ -1,0 +1,86 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_TITLE } from "../consts";
+---
+
+<BaseLayout
+  title={`Termos de Uso | ${SITE_TITLE}`}
+  description="Termos e Condições de Uso."
+>
+  <div class="max-w-3xl mx-auto prose dark:prose-invert prose-zinc mt-8">
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6">Termos de Uso</h1>
+    <p class="text-sm text-zinc-500 mb-8">Última atualização: {new Date().toLocaleDateString('pt-BR')}</p>
+
+    <h2>1. Termos</h2>
+    <p>
+      Ao acessar ao site, concorda em cumprir estes termos de serviço, todas as leis e regulamentos
+      aplicáveis e concorda que é responsável pelo cumprimento de todas as leis locais aplicáveis. Se você não
+      concordar com algum desses termos, está proibido de usar ou acessar este site. Os materiais contidos
+      neste site são protegidos pelas leis de direitos autorais e marcas comerciais aplicáveis.
+    </p>
+
+    <h2>2. Uso de Conteúdo e Propriedade Intelectual</h2>
+    <p>
+      O conteúdo publicado neste blog (artigos, tutoriais, guias) é protegido por direitos autorais. No entanto,
+      incentivamos o compartilhamento de conhecimento. Sendo assim, você tem permissão para:
+    </p>
+    <ul>
+      <li><strong>Compartilhar e citar:</strong> Você pode citar trechos de nossos artigos ou compartilhá-los publicamente em redes sociais e fóruns, desde que seja dado o devido crédito (com um link direto para a página original).</li>
+      <li><strong>Uso de Código (Snippets):</strong> Os blocos de código fornecidos nos tutoriais são de uso livre. Você pode utilizá-los em seus próprios projetos pessoais ou comerciais.</li>
+    </ul>
+    <p>
+      Você <strong>não pode</strong> republicar nossos artigos na íntegra em outros sites ou vendê-los como se fossem de sua autoria.
+    </p>
+
+    <h2>3. Isenção de Responsabilidade</h2>
+    <p>
+      Os materiais no site são fornecidos 'como estão'. Não oferecemos garantias, expressas ou implícitas, e,
+      por este meio, isentamo-nos e negamos todas as outras garantias, incluindo, sem limitação, garantias implícitas
+      ou condições de comercialização, adequação a um fim específico ou não violação de propriedade intelectual
+      ou outra violação de direitos.
+    </p>
+    <p>
+      Além disso, não garantimos ou fazemos qualquer representação relativa à precisão, aos resultados prováveis ou
+      à confiabilidade do uso dos materiais em nosso site ou de outra forma relacionado a esses materiais ou em
+      sites vinculados a este site.
+    </p>
+
+    <h2>4. Limitações</h2>
+    <p>
+      Em nenhum caso nós ou nossos fornecedores seremos responsáveis por quaisquer danos (incluindo, sem
+      limitação, danos por perda de dados ou lucro ou devido a interrupção dos negócios) decorrentes do uso ou da
+      incapacidade de usar os materiais no site, mesmo que nós ou um representante autorizado tenhamos sido
+      notificados oralmente ou por escrito da possibilidade de tais danos.
+    </p>
+
+    <h2>5. Links de Afiliados e Monetização</h2>
+    <p>
+      Para manter este projeto ativo e gratuito, podemos utilizar programas de afiliados e redes de anúncios.
+      Isso significa que:
+    </p>
+    <ul>
+      <li>Alguns links para produtos, serviços ou cursos podem ser links de afiliados. Se você clicar e realizar uma compra, nós podemos receber uma pequena comissão <strong>sem nenhum custo adicional para você</strong>.</li>
+      <li>A presença de anúncios e links de afiliados não influencia nossa opinião técnica ou recomendações no blog.</li>
+    </ul>
+
+    <h2>6. Modificações</h2>
+    <p>
+      Podemos revisar estes termos de serviço do site a qualquer momento, sem aviso prévio. Ao usar este site, você
+      concorda em ficar vinculado à versão atual desses termos de serviço.
+    </p>
+
+    <h2>7. Lei Aplicável</h2>
+    <p>
+      Estes termos e condições são regidos e interpretados de acordo com as leis do Brasil e você se submete
+      irrevogavelmente à jurisdição exclusiva dos tribunais naquele estado ou localidade.
+    </p>
+    
+    <h2>8. Contato</h2>
+    <p>
+      Para esclarecimento de dúvidas sobre os Termos de Uso, entre em contato pelo e-mail:
+      <a href="mailto:gabrielaquinocastelobranco@gmail.com" class="text-brand-primary font-medium hover:underline">
+        gabrielaquinocastelobranco@gmail.com
+      </a>.
+    </p>
+  </div>
+</BaseLayout>
