@@ -1,7 +1,7 @@
 export const resume = {
   name: "Gabriel Aquino Castelo Branco",
   role: "Software Engineer Pleno",
-  bio: "Software Engineer Pleno com 8+ anos de evolução técnica — do Suporte à Engenharia Backend. Não escrevo apenas código; construo ecossistemas escaláveis com foco em infraestrutura, estabilidade e Clean Architecture (Node.js, Java, Go). Quer ver como resolvo desafios complexos na prática? Explore meu Portfólio e Blog! E, nas horas vagas, fã assumido de One Piece.",
+  bio: "Olá! Sou Software Engineer Pleno apaixonado por transformar problemas complexos em soluções escaláveis. Minha jornada começou nos games e fóruns dos anos 2000, e hoje construo arquiteturas modernas (Node.js, Java, Go). Gosto de aliar tecnologia, inteligência artificial e visão estratégica de negócios. Sinta-se em casa para explorar meus projetos e artigos!",
   socials: {
     github: "https://github.com/Gabriel-Aquino",
     linkedin: "https://linkedin.com/in/gabrielaquinocastelobranco/",
@@ -10,6 +10,7 @@ export const resume = {
   experience: [
     {
       company: "Paketá",
+      url: "https://www.paketa.com.br/",
       role: "Software Engineer Pleno",
       period: "Jun 2026 – Atual",
       location: "Remoto",

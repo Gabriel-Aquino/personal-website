@@ -29,42 +29,29 @@ import { resume } from "../data/resume";
             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
           ></path></svg
         >
-        Atualizado recentemente
+        25 de Junho de 2026
       </p>
     </header>
 
     <div
       class="prose prose-zinc dark:prose-invert prose-lg max-w-none text-zinc-700 dark:text-zinc-300"
     >
-      <p>Eu sou um engenheiro de software.</p>
+      <p>Olá, sou o Gabriel Aquino Castelo Branco. 👋</p>
 
       <p>
-        Não interessa o que eu esteja fazendo (e fiz várias coisas nos últimos 8
-        anos, desde consertar infraestrutura de rede até arquitetar ecossistemas
-        B2B de viagens), eu sempre vou fazer isto com a visão de um engenheiro:
-        analisando a tarefa com calma, quebrando um problema grande em partes
-        menores, pensando em como otimizar o resultado e escalar de forma
-        sustentável.
+        Direto de Imperatriz, no Maranhão, sou um desenvolvedor que divide a rotina entre linhas de código, tatames e bons momentos com a galera.
       </p>
 
       <p>
-        Considero o desenvolvimento de software como uma forma de arte, e estou
-        sempre procurando melhorar como profissional.
+        Atuo como desenvolvedor Pleno com foco no ecossistema Node.js — uma escolha que fiz não apenas pelo mercado, mas para honrar a trajetória e as amizades que construí na área. Meu objetivo é sempre criar soluções inteligentes e eficientes. Por isso, meus estudos e meu dia a dia profissional giram em torno de qualidade e arquitetura de software, explorando conceitos como Clean Architecture e DDD 🏗️, além de integrações práticas com Inteligência Artificial 🤖.
       </p>
 
       <p>
-        Passei os últimos anos estudando e aplicando novas arquiteturas de
-        software (<strong>Clean Architecture</strong> e <strong>DDD</strong> são minhas
-        favoritas no momento), aprofundando minha proficiência técnica em linguagens
-        robustas (especialmente Node.js, Java e Go), fazendo deploys para a nuvem
-        (AWS e mensageria distribuída) e garantindo alta disponibilidade para arquiteturas
-        SaaS Multi-Tenant.
+        Quando fecho o editor de código, meu refúgio costuma ser a chácara que meu pai me deixou, o lugar perfeito para cuidar da terra, descansar a mente e reunir os amigos. Para manter a disciplina e o corpo em movimento, a intensidade do Muay Thai 🥊 tomou o lugar da academia tradicional. E, claro, a cultura dos jogos e animes sempre tem espaço: acompanho a jornada de One Piece 🏴‍☠️ e vira e mexe estou no Champions of Regnum ⚔️ lembrando os bons tempos de infância quando passava horas e horas com meu irmão jogando este MMORPG fantástico.
       </p>
 
       <p>
-        Mas nem só de código vive o homem. Nas horas vagas, sou fã assumido de <strong
-          >One Piece</strong
-        > 🏴‍☠️.
+        Musicalmente, sou bem eclético e meu fone de ouvido depende muito do humor do dia 🎧. Mas, graças à forte influência do meu pai, o rock dos anos 70 aos 2000 é a minha base imutável 🎸, tendo Engenheiros do Hawaii e Catedral como minhas bandas brasileiras favoritas absolutas.
       </p>
 
       <div
@@ -72,12 +59,8 @@ import { resume } from "../data/resume";
       >
         <ul class="list-none pl-0 space-y-2 m-0 text-base font-medium">
           <li>🎓 Estudando tecnologia desde sempre</li>
-          <li>💻 Profissional de TI desde 2018</li>
-          <li>
-            🚀 Software Engineer Pleno na <a
-              href="https://www.paketa.com.br/"
-              target="_blank">Paketá</a>
-          </li>
+          <li>💻 Construindo softwares profissionalmente desde 2018</li>
+          <li>🏗️ Focado em Arquiteturas Escaláveis e Node.js</li>
         </ul>
       </div>
 
@@ -97,7 +80,13 @@ import { resume } from "../data/resume";
               </span>
               <div>
                 <span class="font-bold text-zinc-900 dark:text-zinc-100">
-                  {xp.company}
+                  {(xp as any).url ? (
+                    <a href={(xp as any).url} target="_blank" class="hover:underline hover:text-brand-primary transition-colors">
+                      {xp.company}
+                    </a>
+                  ) : (
+                    xp.company
+                  )}
                 </span>
                 <span class="text-zinc-500 dark:text-zinc-400 mx-2 hidden sm:inline">
                   —
