@@ -25,7 +25,7 @@ Para este tutorial, vou partir do princípio que você já tem o Docker instalad
 
 Para começarmos, crie uma pasta onde achar melhor. No meu caso, vou criar em `/home/meuusuario/www/meuprojeto`.
 
-Vamos utilizar como exemplo a imagem oficial do Node.js (`node:14.17.6`) e a imagem `vimagick/json-server` (que simula uma API REST rapidinha). Essa API vai consumir um arquivo chamado `db.json`, que vamos criar dentro de uma nova pasta chamada `api`:
+Vamos utilizar como exemplo a imagem oficial do Node.js (`node:20-alpine`, uma versão moderna, leve e segura) para ambos os serviços. A nossa API vai consumir um arquivo chamado `db.json`, que vamos criar dentro de uma nova pasta chamada `api`:
 
 ```json
 {
@@ -47,22 +47,19 @@ Vamos utilizar como exemplo a imagem oficial do Node.js (`node:14.17.6`) e a ima
 
 ## O serviço do json-server
 
-Agora, criamos o arquivo `docker-compose.yml` na raiz do projeto. Começamos configurando o serviço da nossa API fake:
+Agora, criamos o arquivo `compose.yaml` (ou `docker-compose.yml`) na raiz do projeto. Começamos configurando o serviço da nossa API fake. Em vez de usar imagens de terceiros desatualizadas, vamos rodar o `json-server` direto via `npx` em um container Node oficial:
 
 ```yml
-version: '3'
 services:
   json-server:
     container_name: json-server
-    image: vimagick/json-server
-    command: -H 0.0.0.0 -p 80 -w /api/db.json
+    image: node:20-alpine
+    command: npx -y json-server --watch /api/db.json --port 80 --host 0.0.0.0
     ports:
       - "80:80"
     volumes:
       - ./api:/api
     restart: always
-    expose:
-      - 80
     networks:
       - my_network
 
@@ -74,11 +71,11 @@ networks:
 
 Explicando os comandos principais:
 - **services:** onde definimos os containers que serão criados.
-- **image:** a imagem que o Docker vai baixar do DockerHub.
+- **image:** a imagem base. Aqui usamos o `node:20-alpine`.
+- **command:** o comando executado ao iniciar o container. O `npx -y json-server` baixa e roda o pacote temporariamente, economizando espaço.
 - **ports:** mapeia a porta do container para a porta do nosso computador.
-- **volumes:** espelha a pasta do nosso computador para dentro do container.
-- **expose:** expõe a porta para os outros containers que estiverem na mesma rede (o segredo está aqui!).
-- **networks:** criamos uma rede isolada e conectamos nosso container a ela.
+- **volumes:** espelha a pasta do nosso computador para dentro do container, garantindo que nossos dados persistam e atualizem em tempo real.
+- **networks:** criamos uma rede isolada e conectamos nosso container a ela (o segredo da comunicação interna está aqui!).
 
 ## Criando nossa aplicação Node.js
 
@@ -119,23 +116,25 @@ app.listen(3000, () => {
 });
 ```
 
-Para envelopar isso, crie um `Dockerfile` na raiz do projeto:
+Para envelopar isso, crie um `Dockerfile` na raiz do projeto usando uma versão moderna e leve do Node:
 
 ```dockerfile
-FROM node:14.17.6
+FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-COPY . .
+COPY package*.json ./
 
-RUN npm install express axios nodemon
+RUN npm install
+
+COPY . .
 
 EXPOSE 3000
 ```
 
 ## Juntando tudo e testando
 
-Agora vamos adicionar o serviço do Node.js no nosso `docker-compose.yml`, logo abaixo do `json-server`:
+Agora vamos adicionar o serviço do Node.js no nosso `compose.yaml`, logo abaixo do `json-server`:
 
 ```yml
   nodejs:
@@ -154,10 +153,10 @@ Agora vamos adicionar o serviço do Node.js no nosso `docker-compose.yml`, logo 
       - json-server
 ```
 
-Com tudo no lugar, abra o terminal e rode:
+Com tudo no lugar, abra o terminal e rode utilizando o novo formato do Docker Compose V2 (sem o hífen):
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 Acesse `http://localhost:3000/api/clients` no seu navegador. O que aconteceu?
