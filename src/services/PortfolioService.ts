@@ -6,7 +6,7 @@ export class PortfolioService {
    */
   static async getAllProjects(): Promise<CollectionEntry<"portfolio">[]> {
     const projects = await getCollection("portfolio");
-    return projects;
+    return projects.filter((project) => !project.data.draft);
   }
 
   /**

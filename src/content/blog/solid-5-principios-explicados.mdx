@@ -1,0 +1,322 @@
+---
+title: "SOLID: Os 5 Princípios Explicados com Exemplos Práticos"
+description: "Entenda os 5 princípios do SOLID com exemplos práticos em TypeScript e melhore a qualidade, manutenção e escalabilidade do seu código."
+pubDate: 2026-07-01
+category: "tech"
+tags: ["solid", "clean-code", "typescript", "design-patterns", "backend"]
+isMonetized: true
+featured: true
+coverImage: "https://media.licdn.com/dms/image/v2/D4D12AQF4-ItMunO2Ww/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1668786184657?e=1784764800&v=beta&t=c3wIkR6N2iDpwK-AzNiF6HJQQxBLT4bY2SPOd3eFx1E"
+affiliateProducts:
+  - title: "Livro Recomendado: Desbravando SOLID"
+    description: "Práticas avançadas para códigos de qualidade em Java moderno. Excelente leitura para aprofundar nos conceitos de design e princípios SOLID."
+    imageUrl: "https://m.media-amazon.com/images/I/81fcCW3IbbL._SY425_.jpg"
+    link: "https://link.amazon/B04zeY8SD"
+    price: "Verifique o Preço"
+    badge: "Recomendação"
+---
+
+Se você já ouviu falar em SOLID mas nunca entendeu direito o que significa na prática, este post é pra você.
+
+SOLID é um conjunto de **5 princípios de design de código** que ajudam a escrever software mais fácil de entender, manter e evoluir. O nome é uma sigla: cada letra representa um princípio diferente.
+
+Vamos ver cada um com exemplos reais em TypeScript.
+
+---
+
+## S — Single Responsibility Principle (Princípio da Responsabilidade Única)
+
+> *"Uma classe deve ter um, e somente um, motivo para mudar."*
+
+Isso significa que cada classe, função ou componente deve fazer **uma coisa só**. Se você precisar mudar duas coisas diferentes em uma mesma classe, ela provavelmente está fazendo mais do que deveria.
+
+**❌ Violando o princípio:**
+
+```typescript
+class Usuario {
+  constructor(public nome: string, public email: string) {}
+
+  salvarNoBancoDeDados() {
+    // lógica de persistência aqui
+    console.log(`Salvando ${this.nome} no banco...`);
+  }
+
+  enviarEmailDeBoasVindas() {
+    // lógica de envio de e-mail aqui
+    console.log(`Enviando e-mail para ${this.email}...`);
+  }
+}
+```
+
+Perceba que essa classe faz três coisas: representa um usuário, persiste dados e envia e-mail. Se a lógica de e-mail mudar, você mexe na classe `Usuario`. Se o banco de dados mudar, você mexe na classe `Usuario`. Isso é um sinal de alerta.
+
+**✅ Aplicando o princípio:**
+
+```typescript
+class Usuario {
+  constructor(public nome: string, public email: string) {}
+}
+
+class UsuarioRepository {
+  salvar(usuario: Usuario) {
+    console.log(`Salvando ${usuario.nome} no banco...`);
+  }
+}
+
+class EmailService {
+  enviarBoasVindas(usuario: Usuario) {
+    console.log(`Enviando e-mail para ${usuario.email}...`);
+  }
+}
+```
+
+Agora cada classe tem **uma única responsabilidade** e um único motivo para mudar. 🎯
+
+> 💡 **Dica prática:** se o nome da sua classe ou função tem mais de um verbo (salvar **e** enviar, buscar **e** validar), é um sinal de que ela pode estar quebrando o SRP.
+
+---
+
+## O — Open/Closed Principle (Princípio Aberto-Fechado)
+
+> *"Classes devem estar abertas para extensão, mas fechadas para modificação."*
+
+Isso significa que você deve conseguir **adicionar novos comportamentos sem alterar o código existente**. Isso evita que uma mudança quebre algo que já estava funcionando.
+
+**❌ Violando o princípio:**
+
+```typescript
+class CalculadoraDeDesconto {
+  calcular(tipo: string, preco: number): number {
+    if (tipo === 'vip') return preco * 0.8;
+    if (tipo === 'estudante') return preco * 0.9;
+    return preco;
+  }
+}
+```
+
+Se surgir um novo tipo de desconto (ex: `parceiro`), você precisa **modificar** a classe — e isso pode introduzir bugs.
+
+**✅ Aplicando o princípio:**
+
+```typescript
+interface Desconto {
+  calcular(preco: number): number;
+}
+
+class DescontoVip implements Desconto {
+  calcular(preco: number) { return preco * 0.8; }
+}
+
+class DescontoEstudante implements Desconto {
+  calcular(preco: number) { return preco * 0.9; }
+}
+
+class DescontoParceiro implements Desconto {
+  calcular(preco: number) { return preco * 0.85; }
+}
+
+class CalculadoraDeDesconto {
+  calcular(desconto: Desconto, preco: number): number {
+    return desconto.calcular(preco);
+  }
+}
+```
+
+Agora você pode adicionar quantos tipos de desconto quiser **sem tocar** na `CalculadoraDeDesconto`. Aberta para extensão, fechada para modificação. ✅
+
+---
+
+## L — Liskov Substitution Principle (Princípio da Substituição de Liskov)
+
+> *"Se B herda de A, você deve conseguir usar B em qualquer lugar onde A é esperado, sem quebrar o programa."*
+
+Em outras palavras: uma classe filha deve conseguir **substituir** a classe pai sem que nada quebre.
+
+**❌ Violando o princípio:**
+
+```typescript
+class Ave {
+  voar() {
+    console.log('Voando...');
+  }
+}
+
+class Pinguim extends Ave {
+  voar() {
+    throw new Error('Pinguins não voam!');
+  }
+}
+
+function fazerAveVoar(ave: Ave) {
+  ave.voar(); // quebra se for um Pinguim!
+}
+```
+
+O `Pinguim` herda de `Ave`, mas não consegue substituí-la sem quebrar o programa.
+
+**✅ Aplicando o princípio:**
+
+```typescript
+class Ave {
+  comer() {
+    console.log('Comendo...');
+  }
+}
+
+class AveQueVoa extends Ave {
+  voar() {
+    console.log('Voando...');
+  }
+}
+
+class Pinguim extends Ave {
+  nadar() {
+    console.log('Nadando...');
+  }
+}
+```
+
+Agora a hierarquia faz sentido: nem toda ave voa, e o código reflete isso corretamente. ✅
+
+---
+
+## I — Interface Segregation Principle (Princípio da Segregação de Interfaces)
+
+> *"Nenhuma classe deve ser forçada a implementar métodos que ela não vai usar."*
+
+Interfaces muito grandes obrigam as classes a implementar coisas que não fazem sentido para elas. O ideal é ter interfaces pequenas e específicas.
+
+**❌ Violando o princípio:**
+
+```typescript
+interface Animal {
+  comer(): void;
+  voar(): void;
+  nadar(): void;
+  correr(): void;
+}
+
+class Cachorro implements Animal {
+  comer() { console.log('Comendo'); }
+  voar() { throw new Error('Cachorro não voa!'); } // absurdo
+  nadar() { console.log('Nadando'); }
+  correr() { console.log('Correndo'); }
+}
+```
+
+**✅ Aplicando o princípio:**
+
+```typescript
+interface Comedor {
+  comer(): void;
+}
+
+interface Voador {
+  voar(): void;
+}
+
+interface Nadador {
+  nadar(): void;
+}
+
+interface Corredor {
+  correr(): void;
+}
+
+class Cachorro implements Comedor, Nadador, Corredor {
+  comer() { console.log('Comendo'); }
+  nadar() { console.log('Nadando'); }
+  correr() { console.log('Correndo'); }
+}
+
+class Aguia implements Comedor, Voador {
+  comer() { console.log('Comendo'); }
+  voar() { console.log('Voando'); }
+}
+```
+
+Cada classe implementa **apenas o que faz sentido** para ela. Interfaces pequenas e focadas. ✅
+
+---
+
+## D — Dependency Inversion Principle (Princípio da Inversão de Dependência)
+
+> *"Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de abstrações."*
+
+Em palavras simples: sua classe não deve depender diretamente de uma implementação concreta (ex: MySQL, SendGrid). Ela deve depender de uma **interface** — assim, trocar a implementação é fácil e não quebra nada.
+
+**❌ Violando o princípio:**
+
+```typescript
+class MySQLConnection {
+  connect() {
+    console.log('Conectando ao MySQL...');
+  }
+}
+
+class UsuarioService {
+  private db = new MySQLConnection(); // dependência direta e rígida
+
+  buscarUsuario(id: number) {
+    this.db.connect();
+    // busca no banco...
+  }
+}
+```
+
+Se você precisar trocar de MySQL para PostgreSQL, vai precisar mexer dentro do `UsuarioService`.
+
+**✅ Aplicando o princípio:**
+
+```typescript
+interface DatabaseConnection {
+  connect(): void;
+}
+
+class MySQLConnection implements DatabaseConnection {
+  connect() { console.log('Conectando ao MySQL...'); }
+}
+
+class PostgreSQLConnection implements DatabaseConnection {
+  connect() { console.log('Conectando ao PostgreSQL...'); }
+}
+
+class UsuarioService {
+  constructor(private db: DatabaseConnection) {} // injeção de dependência
+
+  buscarUsuario(id: number) {
+    this.db.connect();
+    // busca no banco...
+  }
+}
+
+// Usando MySQL:
+const service = new UsuarioService(new MySQLConnection());
+
+// Trocando para PostgreSQL sem mexer no UsuarioService:
+const service2 = new UsuarioService(new PostgreSQLConnection());
+```
+
+O `UsuarioService` não sabe (nem precisa saber) qual banco de dados está sendo usado. Ele depende de uma abstração — e isso é **injeção de dependência** na prática. ✅
+
+---
+
+## Resumo rápido
+
+| Letra | Princípio | Em uma frase |
+| :---: | :--- | :--- |
+| **S** | Single Responsibility | Uma classe = uma responsabilidade |
+| **O** | Open/Closed | Extenda sem modificar |
+| **L** | Liskov Substitution | Filha substitui a pai sem quebrar |
+| **I** | Interface Segregation | Interfaces pequenas e específicas |
+| **D** | Dependency Inversion | Dependa de abstrações, não de implementações |
+
+---
+
+## Conclusão
+
+Os princípios SOLID não são regras absolutas que você precisa seguir cegamente — são **diretrizes** que, quando aplicadas com bom senso, tornam o código muito mais fácil de manter e evoluir.
+
+Comece pelo **S** e pelo **D**: eles são os mais impactantes no dia a dia e já vão transformar a forma como você escreve código.
+
+<ProductCard index={0} />

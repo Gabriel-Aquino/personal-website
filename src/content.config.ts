@@ -20,6 +20,7 @@ const blog = defineCollection({
         ),
       isMonetized: z.boolean().default(false),
       featured: z.boolean().default(false),
+      draft: z.boolean().default(false),
 
       // Campos Secundários / Flexíveis
       tags: z
@@ -64,6 +65,7 @@ const portfolio = defineCollection({
       featured: z.boolean().default(false),
       isMonetized: z.boolean().default(false),
       affiliateLink: z.string().url().optional(),
+      draft: z.boolean().default(false),
     }),
 });
 

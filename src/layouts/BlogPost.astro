@@ -13,11 +13,15 @@ const {
   pubDate,
   updatedDate,
   heroImage,
+  coverImage,
   category,
   tags,
   isMonetized,
   affiliateLink,
 } = Astro.props;
+
+const displayImage = heroImage || coverImage;
+
 ---
 
 <BaseLayout title={title} description={description as string}>
@@ -71,11 +75,11 @@ const {
 
     <!-- Cover Image -->
     {
-      heroImage && (
+      displayImage && (
         <div class="w-full rounded-3xl overflow-hidden shadow-2xl mb-16 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-brand-surface aspect-video">
-          {typeof heroImage === "string" ? (
+          {typeof displayImage === "string" ? (
             <img
-              src={heroImage}
+              src={displayImage}
               alt={title}
               class="w-full h-full object-cover"
               loading="eager"
@@ -83,7 +87,7 @@ const {
             />
           ) : (
             <Image
-              src={heroImage}
+              src={displayImage}
               alt={title}
               class="w-full h-full object-cover"
               loading="eager"

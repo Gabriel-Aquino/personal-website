@@ -6,9 +6,9 @@ export class BlogService {
    */
   static async getAllPosts(): Promise<CollectionEntry<"blog">[]> {
     const posts = await getCollection("blog");
-    return posts.sort(
-      (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-    );
+    return posts
+      .filter((post) => !post.data.draft)
+      .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
   }
 
   /**

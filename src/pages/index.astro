@@ -2,7 +2,6 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { BlogService } from "../services/BlogService";
 import { PortfolioService } from "../services/PortfolioService";
-import { resume } from "../data/resume";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { Image } from "astro:assets";
 import PostCard from "../components/PostCard.astro";
@@ -142,11 +141,34 @@ const categories = await BlogService.getAllCategories();
 
       <!-- Tags Filter -->
       <div class="mb-12">
-        <h3
-          class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-4"
-        >
-          Filtrar por Assunto
-        </h3>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <h3
+            class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider"
+          >
+            Filtrar por Assunto
+          </h3>
+          <div class="relative w-full sm:w-64">
+            <input
+              type="text"
+              id="tag-search"
+              placeholder="Pesquisar tag..."
+              class="w-full text-xs px-3 py-1.5 pl-8 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-brand-surface text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-1 focus:ring-brand-primary focus:border-brand-primary transition-all"
+            />
+            <svg
+              class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
+        </div>
         <div
           class="flex flex-nowrap gap-2 overflow-x-auto pb-4 custom-scrollbar"
         >
@@ -214,9 +236,11 @@ const categories = await BlogService.getAllCategories();
     const tagBtns = document.querySelectorAll(".tag-btn");
     const postCards = document.querySelectorAll("#posts-container .post-card");
     const emptyState = document.getElementById("empty-state");
+    const tagSearch = document.getElementById("tag-search") as HTMLInputElement | null;
 
     let activeCategory = "all";
     let activeTag = "all";
+    let tagSearchQuery = "";
 
     function updatePosts() {
       let firstVisibleFound = false;
@@ -275,6 +299,85 @@ const categories = await BlogService.getAllCategories();
       }
     }
 
+    function updateTags() {
+      // Dynamic cascading: find all tags belonging to posts in the active category
+      const allowedTags = new Set<string>();
+      postCards.forEach((card) => {
+        const cat = card.getAttribute("data-category");
+        if (activeCategory === "all" || cat === activeCategory) {
+          const cardTags = card.getAttribute("data-tags")?.split(",") || [];
+          cardTags.forEach((t) => {
+            if (t) allowedTags.add(t.toLowerCase().trim());
+          });
+        }
+      });
+
+      let activeTagStillVisible = activeTag === "all";
+
+      tagBtns.forEach((btn) => {
+        const tag = btn.getAttribute("data-tag");
+        if (!tag || tag === "all") return;
+
+        const tagClean = tag.toLowerCase().trim();
+        const matchesCategory = allowedTags.has(tagClean);
+        const matchesSearch = tagClean.includes(tagSearchQuery);
+
+        if (matchesCategory && matchesSearch) {
+          (btn as HTMLElement).style.display = "inline-flex";
+          if (activeTag === tag) {
+            activeTagStillVisible = true;
+          }
+        } else {
+          (btn as HTMLElement).style.display = "none";
+        }
+      });
+
+      // If active tag was filtered out, reset active tag to "all"
+      if (!activeTagStillVisible) {
+        activeTag = "all";
+        tagBtns.forEach((b) => {
+          const t = b.getAttribute("data-tag");
+          if (t === "all") {
+            b.classList.add(
+              "text-brand-primary",
+              "bg-brand-primary/10",
+              "border-brand-primary/20",
+            );
+            b.classList.remove(
+              "bg-zinc-100",
+              "dark:bg-zinc-800/50",
+              "text-zinc-600",
+              "dark:text-zinc-400",
+              "border-zinc-200",
+              "dark:border-zinc-700/50",
+            );
+          } else {
+            b.classList.remove(
+              "text-brand-primary",
+              "bg-brand-primary/10",
+              "border-brand-primary/20",
+            );
+            b.classList.add(
+              "bg-zinc-100",
+              "dark:bg-zinc-800/50",
+              "text-zinc-600",
+              "dark:text-zinc-400",
+              "border-zinc-200",
+              "dark:border-zinc-700/50",
+            );
+          }
+        });
+        updatePosts();
+      }
+    }
+
+    if (tagSearch) {
+      tagSearch.addEventListener("input", (e) => {
+        tagSearchQuery = (e.target as HTMLInputElement).value.toLowerCase().trim();
+        updateTags();
+      });
+    }
+
     categoryBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
         activeCategory = btn.getAttribute("data-category") || "all";
@@ -303,6 +406,13 @@ const categories = await BlogService.getAllCategories();
           "dark:hover:border-zinc-700"
         );
 
+        // Reset tag search on category change for better UX
+        if (tagSearch) {
+          tagSearch.value = "";
+          tagSearchQuery = "";
+        }
+
+        updateTags();
         updatePosts();
       });
     });
@@ -346,6 +456,7 @@ const categories = await BlogService.getAllCategories();
     });
 
     // Initial setup
+    updateTags();
     updatePosts();
   };
 
