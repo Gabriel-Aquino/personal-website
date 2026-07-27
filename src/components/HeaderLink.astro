@@ -21,9 +21,4 @@ const isActive = href === pathname || href === "/" + (subpath?.[0] || "");
   {...props}
 >
   <slot />
-  {
-    isActive && (
-      <span class="absolute inset-x-1 -bottom-[15px] h-0.5 bg-brand-primary dark:bg-brand-accent" />
-    )
-  }
 </a>

@@ -25,102 +25,107 @@ const displayImage = heroImage || coverImage;
 ---
 
 <BaseLayout title={title} description={description as string}>
-  <article class="max-w-4xl mx-auto pb-12">
-    <!-- Header do Artigo -->
-    <header class="mb-12 text-center">
-      <h1
-        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 text-zinc-900 dark:text-brand-text leading-tight text-balance mx-auto max-w-4xl"
-      >
-        {title}
-      </h1>
+  <div class="flex w-full">
+    <article class="flex-1 max-w-4xl mx-auto pb-12 min-w-0">
+      <!-- Header do Artigo -->
+      <header class="mb-12 text-center">
+        <h1
+          class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 text-zinc-900 dark:text-brand-text leading-tight text-balance mx-auto max-w-4xl"
+        >
+          {title}
+        </h1>
 
-      {
-        category && (
-          <div class="flex flex-wrap justify-center gap-3 mb-4">
-            <span class="px-4 py-1.5 bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary rounded-full text-sm font-bold border border-brand-primary/20 tracking-wider uppercase">
-              {category}
-            </span>
-          </div>
-        )
-      }
-
-      {
-        tags && tags.length > 0 && (
-          <div class="flex flex-wrap justify-center gap-2 mb-8">
-            {tags.map((tag) => (
-              <span class="px-3 py-1 bg-brand-accent/10 text-brand-accent border border-brand-accent/20 rounded-full text-xs font-semibold uppercase tracking-wider">
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )
-      }
-
-      <div
-        class="flex items-center justify-center gap-4 text-zinc-600 dark:text-zinc-400 font-medium"
-      >
-        <FormattedDate date={pubDate} />
         {
-          updatedDate && (
-            <>
-              <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-              <span class="italic">
-                Atualizado em <FormattedDate date={updatedDate} />
+          category && (
+            <div class="flex flex-wrap justify-center gap-3 mb-4">
+              <span class="px-4 py-1.5 bg-brand-primary/10 dark:bg-brand-primary/20 text-brand-primary rounded-full text-sm font-bold border border-brand-primary/20 tracking-wider uppercase">
+                {category}
               </span>
-            </>
+            </div>
           )
         }
+
+        {
+          tags && tags.length > 0 && (
+            <div class="flex flex-wrap justify-center gap-2 mb-8">
+              {tags.map((tag) => (
+                <span class="px-3 py-1 bg-brand-accent/10 text-brand-accent border border-brand-accent/20 rounded-full text-xs font-semibold uppercase tracking-wider">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )
+        }
+
+        <div
+          class="flex items-center justify-center gap-4 text-zinc-600 dark:text-zinc-400 font-medium"
+        >
+          <FormattedDate date={pubDate} />
+          {
+            updatedDate && (
+              <>
+                <span class="w-1.5 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                <span class="italic">
+                  Atualizado em <FormattedDate date={updatedDate} />
+                </span>
+              </>
+            )
+          }
+        </div>
+      </header>
+
+      <!-- Cover Image -->
+      {
+        displayImage && (
+          <div class="w-full rounded-3xl overflow-hidden shadow-2xl mb-16 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-brand-surface aspect-video">
+            {typeof displayImage === "string" ? (
+              <img
+                src={displayImage}
+                alt={title}
+                class="w-full h-full object-cover"
+                loading="eager"
+                fetchpriority="high"
+              />
+            ) : (
+              <Image
+                src={displayImage}
+                alt={title}
+                class="w-full h-full object-cover"
+                loading="eager"
+                fetchpriority="high"
+              />
+            )}
+          </div>
+        )
+      }
+
+      <!-- Conteúdo MDX/Markdown -->
+      <div
+        class="prose prose-zinc dark:prose-invert prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-h2:text-4xl prose-h3:text-3xl prose-a:text-brand-primary dark:prose-a:text-brand-accent w-full mx-auto"
+      >
+        <slot />
       </div>
-    </header>
 
-    <!-- Cover Image -->
-    {
-      displayImage && (
-        <div class="w-full rounded-3xl overflow-hidden shadow-2xl mb-16 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-brand-surface aspect-video">
-          {typeof displayImage === "string" ? (
-            <img
-              src={displayImage}
-              alt={title}
-              class="w-full h-full object-cover"
-              loading="eager"
-              fetchpriority="high"
-            />
-          ) : (
-            <Image
-              src={displayImage}
-              alt={title}
-              class="w-full h-full object-cover"
-              loading="eager"
-              fetchpriority="high"
-            />
-          )}
-        </div>
-      )
-    }
+      <!-- Monetization / Transparency Disclaimer -->
+      {
+        (isMonetized || affiliateLink) && (
+          <div class="max-w-none w-full mx-auto mt-12 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-xl p-5 flex gap-4 items-center text-sm text-zinc-700 dark:text-zinc-300">
+            <span class="text-2xl leading-none pt-0.5">🤝</span>
+            <p class="leading-relaxed mb-0">
+              <strong>Gostou de algum produto citado?</strong> Considere
+              adquiri-los através dos links disponíveis nesta página para apoiar o
+              meu trabalho. Você não paga nada a mais por isso e me ajuda a
+              continuar produzindo conteúdos de qualidade!
+            </p>
+          </div>
+        )
+      }
 
-    <!-- Conteúdo MDX/Markdown -->
-    <div
-      class="prose prose-zinc dark:prose-invert prose-lg md:prose-xl max-w-none prose-headings:font-bold prose-h2:text-4xl prose-h3:text-3xl prose-a:text-brand-primary dark:prose-a:text-brand-accent w-full mx-auto"
-    >
-      <slot />
-    </div>
+      <!-- Comentários -->
+      <Comments />
+    </article>
 
-    <!-- Monetization / Transparency Disclaimer -->
-    {
-      (isMonetized || affiliateLink) && (
-        <div class="max-w-none w-full mx-auto mt-12 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-xl p-5 flex gap-4 items-center text-sm text-zinc-700 dark:text-zinc-300">
-          <span class="text-2xl leading-none pt-0.5">🤝</span>
-          <p class="leading-relaxed mb-0">
-            <strong>Gostou de algum produto citado?</strong> Considere
-            adquiri-los através dos links disponíveis nesta página para apoiar o
-            meu trabalho. Você não paga nada a mais por isso e me ajuda a
-            continuar produzindo conteúdos de qualidade!
-          </p>
-        </div>
-      )
-    }
-
-    <!-- Comentários -->
-    <Comments />
-  </article>
+    <!-- Spacer right to balance the left sidebar and perfectly center the content on the screen -->
+    <div class="hidden lg:block w-64 flex-shrink-0"></div>
+  </div>
 </BaseLayout>

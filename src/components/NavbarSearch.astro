@@ -3,8 +3,7 @@
 ---
 
 <div
-  class="relative w-40 sm:w-64 md:w-72 lg:w-80 group z-[100]"
-  id="search-container"
+  class="relative w-full group z-[100] navbar-search-container"
 >
   <!-- Search Input Trigger -->
   <div class="relative flex items-center w-full">
@@ -22,30 +21,26 @@
     </svg>
     <input
       type="text"
-      id="search-input"
-      placeholder="Buscar..."
-      class="w-full bg-black/5 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-900 dark:text-zinc-100 rounded-lg pl-9 pr-14 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 placeholder:text-zinc-500 cursor-pointer"
+      placeholder="Buscar posts, projetos, tags..."
+      class="search-input w-full bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 text-zinc-900 dark:text-zinc-100 rounded-lg pl-9 pr-14 py-2.5 text-sm font-medium transition-all duration-200 focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary placeholder:text-zinc-500 cursor-text"
       autocomplete="off"
     />
     <div class="absolute right-2 flex items-center">
-      <!-- Hidden by default, updated via JS -->
       <kbd
-        id="search-shortcut"
-        class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 pointer-events-none"
+        class="os-key hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 pointer-events-none"
       >
-        <span id="os-key">⌘</span>K
+        <span>⌘</span>K
       </kbd>
     </div>
   </div>
 
   <!-- Search Results Drawer -->
   <div
-    id="search-drawer"
-    class="absolute top-full right-0 mt-2 w-[calc(100vw-2rem)] sm:w-[400px] max-h-[70vh] overflow-y-auto bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible transition-all duration-200 origin-top-right transform scale-95 fixed sm:absolute left-4 sm:left-auto"
+    class="search-drawer absolute top-full left-0 right-0 mt-2 w-full max-h-[60vh] overflow-y-auto bg-white dark:bg-brand-surface border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-2xl opacity-0 invisible transition-all duration-200 origin-top transform scale-95"
   >
-    <div class="p-4" id="search-results">
+    <div class="p-4 search-results">
       <p class="text-sm text-zinc-500 dark:text-zinc-400 text-center py-4">
-        Digite para buscar postagens e projetos...
+        Digite para buscar...
       </p>
     </div>
   </div>
@@ -64,60 +59,86 @@
   let isFetching = false;
   let isMac = false;
 
-  // We only want to add the global document listeners ONCE.
   if (typeof window !== "undefined") {
     isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
     document.addEventListener("keydown", (e) => {
-      const drawer = document.getElementById("search-drawer");
-      const isOpen = drawer && !drawer.classList.contains("opacity-0");
+      const drawers = document.querySelectorAll(".search-drawer");
+      let anyOpen = false;
+      drawers.forEach((drawer) => {
+        if (!drawer.classList.contains("opacity-0")) anyOpen = true;
+      });
 
       if ((isMac ? e.metaKey : e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        openSearch();
+        // Open the first visible search input
+        const containers = document.querySelectorAll(".navbar-search-container");
+        for (const container of containers) {
+          if (window.getComputedStyle(container).display !== "none") {
+            openSearch(container as HTMLElement);
+            break;
+          }
+        }
       }
-      if (e.key === "Escape" && isOpen) {
-        closeSearch();
+      if (e.key === "Escape" && anyOpen) {
+        closeAllSearches();
       }
     });
 
     document.addEventListener("click", (e) => {
-      const container = document.getElementById("search-container");
-      const drawer = document.getElementById("search-drawer");
-      const isOpen = drawer && !drawer.classList.contains("opacity-0");
-
-      if (isOpen && container && !container.contains(e.target as Node)) {
-        closeSearch();
+      let clickedInside = false;
+      document.querySelectorAll(".navbar-search-container").forEach((container) => {
+        if (container.contains(e.target as Node)) {
+          clickedInside = true;
+        }
+      });
+      if (!clickedInside) {
+        closeAllSearches();
       }
     });
   }
 
-  // Runs on EVERY page transition to attach local input listeners
   document.addEventListener("astro:page-load", () => {
-    const input = document.getElementById("search-input") as HTMLInputElement;
-    const shortcutKey = document.getElementById("os-key");
+    const containers = document.querySelectorAll(".navbar-search-container");
+    
+    containers.forEach(container => {
+      const input = container.querySelector(".search-input") as HTMLInputElement;
+      const shortcutKey = container.querySelector(".os-key span");
+      
+      if (shortcutKey) shortcutKey.textContent = isMac ? "⌘" : "Ctrl";
 
-    if (shortcutKey) shortcutKey.textContent = isMac ? "⌘" : "Ctrl";
-
-    if (input) {
-      input.addEventListener("focus", openSearch);
-      input.addEventListener("input", (e) => {
-        const query = (e.target as HTMLInputElement).value.toLowerCase();
-        renderResults(query);
-      });
-    }
+      if (input) {
+        input.addEventListener("focus", () => openSearch(container as HTMLElement));
+        input.addEventListener("input", (e) => {
+          const query = (e.target as HTMLInputElement).value.toLowerCase();
+          renderResults(container as HTMLElement, query);
+          
+          // Disparar evento customizado para que o index.astro possa filtrar as tags
+          const event = new CustomEvent('globalSearchInput', { detail: { query } });
+          window.dispatchEvent(event);
+        });
+      }
+    });
   });
 
-  async function openSearch() {
-    const input = document.getElementById("search-input") as HTMLInputElement;
-    const drawer = document.getElementById("search-drawer");
-    const resultsDiv = document.getElementById("search-results");
+  async function openSearch(container: HTMLElement) {
+    const input = container.querySelector(".search-input") as HTMLInputElement;
+    const drawer = container.querySelector(".search-drawer");
+    const resultsDiv = container.querySelector(".search-results");
 
     if (!drawer || !input) return;
 
     drawer.classList.remove("opacity-0", "invisible", "scale-95");
     drawer.classList.add("opacity-100", "visible", "scale-100");
-    input.focus();
+    
+    // Close other drawers
+    document.querySelectorAll(".navbar-search-container").forEach(c => {
+      if (c !== container) {
+        const d = c.querySelector(".search-drawer");
+        d?.classList.add("opacity-0", "invisible", "scale-95");
+        d?.classList.remove("opacity-100", "visible", "scale-100");
+      }
+    });
 
     if (searchData.length === 0 && !isFetching) {
       isFetching = true;
@@ -128,7 +149,7 @@
       try {
         const res = await fetch("/api/search.json");
         searchData = await res.json();
-        renderResults(input.value.toLowerCase() || "");
+        renderResults(container, input.value.toLowerCase() || "");
       } catch {
         if (resultsDiv)
           resultsDiv.innerHTML =
@@ -137,22 +158,25 @@
         isFetching = false;
       }
     } else {
-      renderResults(input.value.toLowerCase() || "");
+      renderResults(container, input.value.toLowerCase() || "");
     }
   }
 
-  function closeSearch() {
-    const input = document.getElementById("search-input") as HTMLInputElement;
-    const drawer = document.getElementById("search-drawer");
-
-    if (!drawer) return;
-    drawer.classList.remove("opacity-100", "visible", "scale-100");
-    drawer.classList.add("opacity-0", "invisible", "scale-95");
-    if (input) input.blur();
+  function closeAllSearches() {
+    document.querySelectorAll(".navbar-search-container").forEach(container => {
+      const input = container.querySelector(".search-input") as HTMLInputElement;
+      const drawer = container.querySelector(".search-drawer");
+      
+      if (drawer) {
+        drawer.classList.remove("opacity-100", "visible", "scale-100");
+        drawer.classList.add("opacity-0", "invisible", "scale-95");
+      }
+      if (input) input.blur();
+    });
   }
 
-  function renderResults(query: string) {
-    const resultsDiv = document.getElementById("search-results");
+  function renderResults(container: HTMLElement, query: string) {
+    const resultsDiv = container.querySelector(".search-results");
     if (!resultsDiv) return;
 
     if (!query.trim()) {
@@ -180,7 +204,7 @@
       <a href="${escapeHTML(item.url)}" class="block py-3 px-2 border-b border-zinc-100 dark:border-zinc-800 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 rounded-lg transition-colors group">
         <div class="flex items-center gap-2 mb-1">
           <span class="text-[10px] uppercase font-bold tracking-wider text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded">${escapeHTML(item.type)}</span>
-          <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-primary transition-colors">${highlight(escapeHTML(item.title), query)}</h4>
+          <h4 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-primary transition-colors line-clamp-1">${highlight(escapeHTML(item.title), query)}</h4>
         </div>
         <p class="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1">${escapeHTML(item.description)}</p>
       </a>
@@ -207,7 +231,7 @@
     const regex = new RegExp(`(${query})`, "gi");
     return text.replace(
       regex,
-      '<mark class="bg-brand-primary/20 text-brand-primary rounded px-0.5">$1</mark>',
+      '<mark class="bg-brand-primary/20 text-brand-primary rounded px-0.5 text-inherit">$1</mark>',
     );
   }
 </script>

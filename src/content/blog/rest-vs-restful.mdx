@@ -1,0 +1,214 @@
+---
+title: "REST vs RESTful: Níveis de maturidade e como construir uma boa API"
+description: "Entenda a diferença real entre REST e RESTful, os níveis de maturidade de Richardson (HATEOAS) e as boas práticas para projetar APIs modernas."
+pubDate: 2026-07-28
+category: "tech"
+tags: ["api", "rest", "backend", "http", "arquitetura"]
+isMonetized: true
+draft: false
+coverImage: "https://www.encodedots.com/blog/wp-content/uploads/2025/11/REST-API-vs-RESTful-API.jpg"
+affiliateProducts:
+  - title: "Livro Recomendado: APIs RESTful"
+    description: "Referência essencial para aprimorar suas habilidades na construção de APIs escaláveis e robustas."
+    imageUrl: "https://m.media-amazon.com/images/I/91dbOaFnTTL._SY385_.jpg"
+    link: "https://link.amazon/B0fLay88k"
+    price: "Verifique o Preço"
+    badge: "Recomendação"
+---
+
+Você provavelmente já ouviu as palavras **REST** e **RESTful** sendo usadas como se fossem a mesma coisa. Mas não são. E entender essa diferença vai mudar a forma como você projeta suas APIs.
+
+## O que é REST?
+
+REST significa **Representational State Transfer** — um estilo arquitetural criado por Roy Fielding em sua dissertação de doutorado, em 2000.
+
+REST não é uma tecnologia nem um protocolo. É um **conjunto de restrições** que, quando seguidas, resultam em uma arquitetura de software leve, simples e escalável para comunicação entre sistemas via HTTP.
+
+As principais características do REST:
+
+- **Stateless** — cada requisição deve conter todas as informações necessárias (por isso usamos tokens de autenticação em cada chamada);
+- **Cacheável** — as respostas podem ser armazenadas em cache para melhorar a performance;
+- **Interface uniforme** — os recursos são acessados por URLs bem definidas usando os verbos HTTP corretos.
+
+## REST vs RESTful: qual é a diferença?
+
+Simples:
+
+- **REST** é o estilo, a filosofia, o conjunto de princípios;
+- **RESTful** é a API que **segue todos esses princípios** corretamente.
+
+Ou seja: toda API RESTful é REST, mas nem toda API REST é RESTful.
+
+Pense assim: REST é como as regras de um jogo de xadrez. RESTful é jogar xadrez seguindo todas as regras direito.
+
+---
+
+## O Modelo de Maturidade de Richardson
+
+Em 2008, Leonard Richardson criou um modelo para medir o quão "madura" uma API REST é. São 4 níveis, do 0 ao 3.
+
+### Nível 0 — The Swamp of POX ("Pântano do XML puro")
+
+Nenhuma padronização. A API usa HTTP como um simples canal de transporte, geralmente com um único endpoint e sempre o mesmo método.
+
+```json
+POST /api
+Content-Type: application/json
+
+{ "acao": "buscarUsuario", "id": 1 }
+```
+
+```json
+POST /api
+Content-Type: application/json
+
+{ "acao": "deletarUsuario", "id": 1 }
+```
+
+Tudo vai para o mesmo endpoint `/api`. A "ação" fica dentro do corpo da requisição. Não é REST — é só HTTP sendo mal usado.
+
+---
+
+### Nível 1 — Resources (Recursos)
+
+A API começa a usar **URLs diferentes para recursos diferentes**. Cada entidade tem seu próprio endpoint.
+
+```text
+POST /usuarios
+POST /usuarios/1
+POST /produtos
+POST /produtos/42
+```
+
+Já é melhor! Os recursos estão separados. Mas ainda usa POST para tudo — inclusive para buscar e deletar. O verbo HTTP ainda não está sendo usado corretamente.
+
+---
+
+### Nível 2 — HTTP Verbs (Verbos HTTP)
+
+Agora a API usa **o verbo HTTP correto para cada operação**. Esse é o nível que a maioria das APIs chama de "REST" no mercado.
+
+```text
+GET    /usuarios        → lista todos os usuários
+GET    /usuarios/1      → busca o usuário com id 1
+POST   /usuarios        → cria um novo usuário
+PUT    /usuarios/1      → atualiza o usuário com id 1 (completo)
+PATCH  /usuarios/1      → atualiza campos específicos do usuário 1
+DELETE /usuarios/1      → deleta o usuário com id 1
+```
+
+Cada verbo tem um significado claro:
+
+| Verbo      | Ação                    | Idempotente? |
+| :--------- | :---------------------- | :----------- |
+| **GET**    | Buscar / listar         | Sim          |
+| **POST**   | Criar                   | Não          |
+| **PUT**    | Substituir por completo | Sim          |
+| **PATCH**  | Atualizar parcialmente  | Sim          |
+| **DELETE** | Deletar                 | Sim          |
+
+> 💡 **Idempotente** significa que fazer a mesma requisição várias vezes produz o mesmo resultado. Um `GET /usuarios/1` repetido sempre retorna o mesmo usuário. Um `POST /usuarios` repetido cria vários usuários.
+
+---
+
+### Nível 3 — HATEOAS (Hypermedia as the Engine of Application State)
+
+Este é o nível que define uma API verdadeiramente **RESTful**. Além de retornar os dados, a API retorna também **links para as ações que podem ser feitas** a partir daquela resposta.
+
+Exemplo: você busca um pedido e a API já te diz o que é possível fazer com ele:
+
+```json
+GET /pedidos/99
+
+{
+  "id": 99,
+  "status": "aguardando_pagamento",
+  "total": 250.00,
+  "_links": {
+    "self": { "href": "/pedidos/99" },
+    "pagar": { "href": "/pedidos/99/pagamento", "method": "POST" },
+    "cancelar": { "href": "/pedidos/99/cancelamento", "method": "DELETE" },
+    "cliente": { "href": "/clientes/42" }
+  }
+}
+```
+
+O cliente da API não precisa saber de antemão quais rotas existem. A própria resposta **guia** o que pode ser feito. Isso torna a API muito mais flexível e autodescritiva.
+
+> 💡 Na prática do mercado, a maioria das APIs está no **Nível 2**. O Nível 3 (HATEOAS) é mais comum em APIs públicas grandes, como PayPal e GitHub.
+
+---
+
+## Restrições para uma API ser RESTful
+
+Além dos níveis de maturidade, uma API RESTful precisa respeitar seis restrições definidas por Fielding:
+
+1. **Uniform Interface** — interface consistente e padronizada;
+2. **Stateless** — sem estado no servidor; cada requisição é independente;
+3. **Cacheable** — respostas devem indicar se podem ser cacheadas;
+4. **Client-Server** — cliente e servidor são independentes entre si;
+5. **Layered System** — o cliente não precisa saber se está falando diretamente com o servidor ou com um intermediário (proxy, load balancer);
+6. **Middleware** — interceptadores que podem alterar ou interromper requisições (ex: autenticação, rate limiting).
+
+---
+
+## Boas práticas para construir uma boa API REST
+
+Algumas regras que fazem diferença no dia a dia:
+
+**✅ Use substantivos nas URLs, nunca verbos:**
+
+```text
+✅ GET /usuarios        → correto
+❌ GET /buscarUsuarios  → errado, verbo na URL
+```
+
+**✅ Use o plural nos recursos:**
+
+```text
+✅ GET /produtos/1
+❌ GET /produto/1
+```
+
+**✅ Use os códigos HTTP corretos:**
+
+```text
+200 OK          → sucesso na busca
+201 Created     → recurso criado com sucesso
+400 Bad Request → erro do cliente (dados inválidos)
+401 Unauthorized → não autenticado
+403 Forbidden   → autenticado mas sem permissão
+404 Not Found   → recurso não encontrado
+500 Internal Server Error → erro no servidor
+```
+
+**✅ Versione sua API:**
+
+```text
+/api/v1/usuarios
+/api/v2/usuarios
+```
+
+Isso permite evoluir a API sem quebrar integradores que já usam a versão antiga.
+
+---
+
+## Resumo
+
+| Nível | Nome         | O que faz                               |
+| :---- | :----------- | :-------------------------------------- |
+| **0** | Swamp of POX | HTTP como transporte, sem padrão        |
+| **1** | Resources    | URLs separadas por recurso              |
+| **2** | HTTP Verbs   | Verbos corretos para cada operação      |
+| **3** | HATEOAS      | Respostas com links para próximas ações |
+
+---
+
+## Conclusão
+
+A maioria das APIs que você vai construir ou consumir no mercado está no Nível 2. Chegar lá já é um ótimo resultado. O HATEOAS é um diferencial para APIs públicas que precisam ser realmente autodescritivas.
+
+O mais importante é entender os princípios por trás de cada nível — isso te ajuda a tomar decisões mais conscientes quando estiver projetando ou revisando uma API.
+
+---
+<ProductCard index={0} />
