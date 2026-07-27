@@ -1,6 +1,7 @@
 ---
 import BaseHead from "../components/BaseHead.astro";
 import SidebarLeft from "../components/SidebarLeft.astro";
+import SidebarRight from "../components/SidebarRight.astro";
 import Footer from "../components/Footer.astro";
 import CookieBanner from "../components/CookieBanner.astro";
 import type { ImageMetadata } from "astro";
@@ -10,9 +11,10 @@ interface Props {
   description: string;
   image?: ImageMetadata;
   ignoreSearch?: boolean;
+  showRightSidebar?: boolean;
 }
 
-const { title, description, image, ignoreSearch = false } = Astro.props;
+const { title, description, image, ignoreSearch = false, showRightSidebar = true } = Astro.props;
 ---
 
 <!doctype html>
@@ -31,7 +33,16 @@ const { title, description, image, ignoreSearch = false } = Astro.props;
     
     <div class="flex-1 lg:ml-64 flex flex-col min-w-0 min-h-screen">
       <main class="flex-grow w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <slot />
+        <div class="flex flex-col xl:flex-row gap-8 xl:gap-12 relative w-full h-full">
+          <div class="flex-1 min-w-0 w-full">
+            <slot />
+          </div>
+          {showRightSidebar && (
+            <aside class="hidden xl:block w-80 flex-shrink-0 relative">
+              <SidebarRight />
+            </aside>
+          )}
+        </div>
       </main>
       <Footer />
     </div>
