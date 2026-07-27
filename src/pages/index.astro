@@ -22,69 +22,54 @@ const filterablePosts = posts;
     <!-- Left Column: Main Content -->
     <div class="flex-1 min-w-0 w-full">
       
-      <!-- Mobile Search and Tags (visible only on mobile/tablet) -->
-      <div class="block xl:hidden mb-8 z-50">
-        <NavbarSearch />
-        <div class="mt-6">
-          <h3 class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">Filtrar por Assunto</h3>
-          <div class="flex flex-nowrap gap-2 overflow-x-auto pb-4 custom-scrollbar">
-            <button data-tag="all" class="tag-btn uppercase tracking-wider text-[10px] font-bold text-brand-primary px-3 py-1.5 bg-brand-primary/10 border border-brand-primary/20 rounded-full transition-all shadow-sm shrink-0">Todos</button>
-            {tags.map(tag => (
-              <button data-tag={tag} class="tag-btn uppercase tracking-wider text-[10px] font-bold text-zinc-600 dark:text-zinc-400 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-full hover:bg-brand-primary hover:text-white dark:hover:bg-brand-primary dark:hover:text-white hover:border-brand-primary dark:hover:border-brand-primary transition-all shadow-sm shrink-0">{tag}</button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <!-- Mobile Search placeholder -->
+      <div class="hidden"></div>
 
-      <section class="w-full space-y-20">
+      <section class="w-full space-y-16">
         
-        <!-- TOP SECTION: Últimas Postagens (65%) & Destaques (35%) -->
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 xl:gap-12 w-full">
-          
-          <!-- Column 1 (65%): Últimas Postagens -->
-          {latestPosts.length > 0 && (
-            <div class="xl:col-span-2 w-full">
-              <h2 class="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6 border-b border-zinc-200 dark:border-zinc-800/50 pb-4 w-full">
-                Últimas postagens
-              </h2>
-              <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
-                {heroPost && (
-                  <div class="lg:col-span-2">
-                    <PostCard post={heroPost} isHero={true} />
-                  </div>
-                )}
-                {stackedPosts.length > 0 && (
-                  <div class="flex flex-col gap-3">
-                    {stackedPosts.map((post) => (
-                      <PostCard post={post} isCompact={true} />
-                    ))}
-                  </div>
-                )}
-              </div>
+        <!-- SECTION 1: Últimas Postagens -->
+        {latestPosts.length > 0 && (
+          <div class="w-full">
+            <h2 class="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6 border-b border-zinc-200 dark:border-zinc-800/50 pb-4 w-full">
+              Últimas postagens
+            </h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
+              {heroPost && (
+                <div class="lg:col-span-2">
+                  <PostCard post={heroPost} isHero={true} />
+                </div>
+              )}
+              {stackedPosts.length > 0 && (
+                <div class="flex flex-col gap-3">
+                  {stackedPosts.map((post) => (
+                    <PostCard post={post} isCompact={true} />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
-          <!-- Column 2 (35%): Destaques -->
-          {featuredPosts.length > 0 && (
-            <div class="xl:col-span-1 w-full">
-              <h2 class="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6 border-b border-zinc-200 dark:border-zinc-800/50 pb-4 flex items-center gap-2">
-                <svg
-                  class="w-6 h-6 text-brand-primary"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-                Destaques
-              </h2>
-              <div class="flex flex-col gap-3">
-                {featuredPosts.slice(0, 4).map((post) => (
-                  <PostCard post={post} isCompact={true} />
-                ))}
-              </div>
+        <!-- SECTION 2 (Mobile Only): Destaques -->
+        {featuredPosts.length > 0 && (
+          <div class="block xl:hidden w-full">
+            <h2 class="text-2xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6 border-b border-zinc-200 dark:border-zinc-800/50 pb-4 flex items-center gap-2">
+              <svg
+                class="w-6 h-6 text-brand-primary"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              Destaques
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+              {featuredPosts.slice(0, 4).map((post) => (
+                <PostCard post={post} isCompact={true} />
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         <!-- SECTION 3: Postagens (Filterable) -->
         <div class="w-full">
@@ -92,25 +77,46 @@ const filterablePosts = posts;
             Postagens
           </h2>
           
-          <!-- Categories Tabs (Filters) -->
-          <div class="mb-8 w-full">
-            <div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar border-b border-zinc-200 dark:border-zinc-800/50 w-full">
-              <button
-                data-category="all"
-                class="category-btn pb-3 border-b-2 font-bold whitespace-nowrap px-2 transition-colors text-brand-primary border-brand-primary"
-              >
-                Todos
-              </button>
-              {
-                categories.map((cat) => (
+          <!-- Search & Filters Block -->
+          <div class="mb-8 w-full bg-zinc-50 dark:bg-zinc-800/30 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800/50">
+            <div class="mb-6 xl:hidden">
+              <NavbarSearch />
+            </div>
+            
+            <div class="flex flex-col gap-6">
+              <!-- Categories -->
+              <div>
+                <h3 class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">Categorias</h3>
+                <div class="flex gap-4 overflow-x-auto pb-2 custom-scrollbar w-full">
                   <button
-                    data-category={cat}
-                    class="category-btn pb-3 border-b-2 font-bold whitespace-nowrap px-2 transition-colors border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700"
+                    data-category="all"
+                    class="category-btn pb-2 border-b-2 font-bold whitespace-nowrap px-2 transition-colors text-brand-primary border-brand-primary"
                   >
-                    {cat}
+                    Todos
                   </button>
-                ))
-              }
+                  {
+                    categories.map((cat) => (
+                      <button
+                        data-category={cat}
+                        class="category-btn pb-2 border-b-2 font-bold whitespace-nowrap px-2 transition-colors border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-700"
+                      >
+                        {cat}
+                      </button>
+                    ))
+                  }
+                </div>
+              </div>
+
+              <!-- Tags -->
+              <div>
+                <h3 class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">Assuntos</h3>
+                <div class="flex flex-nowrap gap-2 overflow-x-auto pb-4 custom-scrollbar w-full">
+                  <button data-tag="all" class="tag-btn uppercase tracking-wider text-[10px] font-bold text-brand-primary px-3 py-1.5 bg-brand-primary/10 border border-brand-primary/20 rounded-full transition-all shadow-sm shrink-0">Todos</button>
+                  {tags.map(tag => (
+                    <button data-tag={tag} class="tag-btn uppercase tracking-wider text-[10px] font-bold text-zinc-600 dark:text-zinc-400 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-full hover:bg-brand-primary hover:text-white dark:hover:bg-brand-primary dark:hover:text-white hover:border-brand-primary dark:hover:border-brand-primary transition-all shadow-sm shrink-0">{tag}</button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -143,20 +149,30 @@ const filterablePosts = posts;
       </section>
     </div>
 
-    <!-- Right Sidebar: Search & Tags (Desktop only) -->
+    <!-- Right Sidebar (Desktop only) -->
     <aside class="hidden xl:block w-80 flex-shrink-0 relative">
       <div class="sticky top-8 space-y-8 z-40">
         <NavbarSearch />
         
-        <div>
-          <h3 class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-4">Filtrar por Assunto</h3>
-          <div class="flex flex-wrap gap-2">
-            <button data-tag="all" class="tag-btn uppercase tracking-wider text-[10px] font-bold text-brand-primary px-3 py-1.5 bg-brand-primary/10 border border-brand-primary/20 rounded-full transition-all shadow-sm shrink-0">Todos</button>
-            {tags.map(tag => (
-              <button data-tag={tag} class="tag-btn uppercase tracking-wider text-[10px] font-bold text-zinc-600 dark:text-zinc-400 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-full hover:bg-brand-primary hover:text-white dark:hover:bg-brand-primary dark:hover:text-white hover:border-brand-primary dark:hover:border-brand-primary transition-all shadow-sm shrink-0">{tag}</button>
-            ))}
+        {featuredPosts.length > 0 && (
+          <div class="w-full">
+            <h2 class="text-sm font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <svg
+                class="w-4 h-4 text-brand-primary"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              Destaques
+            </h2>
+            <div class="flex flex-col gap-4">
+              {featuredPosts.slice(0, 4).map((post) => (
+                <PostCard post={post} isCompact={true} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </aside>
 
