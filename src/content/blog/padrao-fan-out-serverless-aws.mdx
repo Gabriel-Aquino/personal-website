@@ -1,0 +1,178 @@
+---
+title: "Padrão Fan-out em Serverless: Escalando processamento complexo com SQS e Lambda"
+description: "Aprenda como escalar processos complexos e evitar timeouts em arquiteturas Serverless utilizando o padrão Fan-out com AWS SQS e Lambdas."
+pubDate: "2026-08-04"
+category: "Tech"
+tags: ["AWS", "Cloud", "Serverless", "SQS", "Lambda"]
+isMonetized: true
+featured: true
+coverImage: "../../assets/padrao-fan-out-aws-lambda.png"
+affiliateProducts:
+  - title: "Recomendação de Leitura: Arquitetura de Nuvem - Amazon Web Services (AWS)"
+    description: "Aprofunde seus conhecimentos em arquitetura Serverless na AWS com este excelente material."
+    imageUrl: "https://m.media-amazon.com/images/I/81l9A-dpaQL._SY385_.jpg"
+    link: "https://link.amazon/B07IY7g9E"
+    price: "Verifique o Preço"
+    badge: "Recomendação"
+---
+
+# Padrão Fan-out em Serverless: Escalando processamento complexo com SQS e Lambda
+
+Se você trabalha com arquitetura Serverless na AWS, provavelmente já precisou criar uma rotina agendada (Cron) para processar dados em massa na calada da noite.
+
+Recentemente, me deparei com um cenário no meu dia a dia: tínhamos uma Lambda engatilhada por uma Cron diária às 4:00 da manhã. O objetivo dela? Buscar milhares (ou até milhões) de registros no banco de dados e executar um processamento complexo para cada um deles. Esse processamento envolvia criar faturas, atualizar status, registrar histórico e se comunicar com outras Lambdas e APIs de terceiros.
+
+A princípio, a intuição de muitos desenvolvedores (e a minha também foi) é: faço a busca no banco, faço um loop (ou `Promise.all`) e processo tudo ali mesmo, dentro da Lambda.
+
+Foi aí que meu Tech Lead me ajudou a enxergar um problema silencioso, mas letal: o temido Timeout e o pesadelo do Reprocessamento.
+
+## O Problema: O Monolito Disfarçado e a "Armadilha da DLQ"
+
+O grande gargalo nesse tipo de operação não é o processamento da CPU, mas sim o I/O de rede. Fazer múltiplas chamadas para outros serviços e APIs consome tempo. Como as AWS Lambdas possuem um limite de tempo de execução (timeout máximo de 15 minutos), processar um lote gigante de forma síncrona é pedir para o processo morrer na metade.
+
+Mas o timeout não é o único vilão. Pense no seguinte cenário:
+
+Você pega 5.000 registros para processar em uma única execução. O processo roda bem até o registro 4.999, mas o último falha (talvez uma instabilidade na API externa).
+
+Como a Lambda falhou, o evento inteiro (com os 5.000 itens) vai parar na sua DLQ (Dead Letter Queue) para ser reprocessado depois. Quando você tentar reprocessar, terá que garantir que seu código seja perfeitamente idempotente para não duplicar faturas ou transações dos 4.999 itens que já haviam dado certo. O custo computacional — e financeiro (na sua fatura da AWS) — de reprocessar lotes massivos por causa de uma única falha é altíssimo.
+
+## A Solução: Dividir para Conquistar com o Padrão Fan-out
+
+Para resolver isso, nós quebramos essa arquitetura em duas partes, implementando o padrão de Fan-out (ou Schedule/Worker).
+
+Em vez de uma única Lambda fazer o trabalho pesado, dividimos as responsabilidades:
+
+- **A Lambda Scheduler (Preparadora):** Ela acorda às 4h00, busca os dados no banco usando paginação e simplesmente enfileira os IDs na SQS. Ela é rápida, leve e nunca sofre timeout.
+- **A Lambda Worker (Executora):** Conectada à SQS, ela consome os itens de forma granular. Se tivermos milhões de mensagens, a AWS escala essa Lambda horizontalmente para processar tudo em paralelo.
+
+### O Código: Implementando a Lambda Scheduler em TypeScript
+
+Para tornar o enfileiramento eficiente e não onerar os custos da AWS chamando a fila um por um, utilizamos o `SendMessageBatchCommand` do AWS SDK v3, que permite enviar até 10 mensagens por requisição de forma assíncrona.
+
+Veja um exemplo simplificado e prático de como estruturar esse UseCase:
+
+```typescript
+import { SQSClient, SendMessageBatchCommand } from "@aws-sdk/client-sqs";
+import { randomUUID } from "crypto";
+
+// Constantes para otimização
+const PAGE_SIZE = 50;
+const SQS_BATCH_MAX_SIZE = 10;
+
+export class ProcessContractsSchedulerUseCase {
+  constructor(
+    private readonly repository: ContractRepository, // Seu repositório
+    private readonly sqsClient: SQSClient,
+    private readonly queueUrl: string,
+  ) {}
+
+  async execute(referenceDate = new Date()): Promise<void> {
+    console.log(`Iniciando agendamento de contratos. Data: ${referenceDate}`);
+
+    // Usamos um iterator/generator para não sobrecarregar a memória
+    const iterator = this.repository.findPendingContractsIterator({
+      dateUntil: referenceDate,
+      pageSize: PAGE_SIZE,
+    });
+
+    let enqueuedCount = 0;
+
+    for await (const batch of iterator) {
+      // Extraímos apenas os IDs para transitar o mínimo de dados possível
+      const contractIds = batch.map((contract) => contract.id);
+      await this.enqueueInChunks(contractIds);
+
+      enqueuedCount += batch.length;
+    }
+
+    console.log(`Agendamento finalizado. Mensagens na fila: ${enqueuedCount}`);
+  }
+
+  // Função auxiliar para quebrar o array maior em pedaços de 10
+  private async enqueueInChunks(ids: string[]): Promise<void> {
+    const chunks = this.chunkArray(ids, SQS_BATCH_MAX_SIZE);
+
+    for (const chunk of chunks) {
+      try {
+        const command = new SendMessageBatchCommand({
+          QueueUrl: this.queueUrl,
+          Entries: chunk.map((id) => ({
+            Id: randomUUID(), // identificador único dentro deste lote de envio
+            MessageBody: JSON.stringify({ contractId: id }),
+          })),
+        });
+
+        await this.sqsClient.send(command);
+      } catch (error) {
+        console.error("Falha ao enviar lote para a SQS.", { error, chunk });
+      }
+    }
+  }
+
+  private chunkArray<T>(array: T[], size: number): T[][] {
+    return Array.from({ length: Math.ceil(array.length / size) }, (v, i) =>
+      array.slice(i * size, i * size + size),
+    );
+  }
+}
+```
+
+### E o outro lado da fila? A Lambda Worker
+
+O Scheduler só resolve metade do problema — a outra metade é como a Worker consome essa fila. A configuração do trigger é tão importante quanto o código:
+
+```javascript
+export default {
+  handler: "worker.handler",
+  timeout: 120, // segundos — sempre menor que o VisibilityTimeout da fila
+  events: [
+    {
+      sqs: {
+        batchSize: 5, // quantas mensagens processa por invocação
+        maximumConcurrency: 2, // quantas invocações paralelas no máximo
+        arn: "...",
+        functionResponseType: "ReportBatchItemFailures",
+      },
+    },
+  ],
+};
+```
+
+O `maximumConcurrency` limita quantas execuções da Worker rodam ao mesmo tempo — é uma proteção importante quando você depende de uma API de terceiros com rate limit: sem esse limite, a AWS poderia escalar a Worker agressivamente e te bloquear na API externa por excesso de chamadas simultâneas.
+
+### Atenção: o isolamento de falhas não é automático
+
+Um erro comum ao implementar esse padrão é assumir que, por estar usando SQS, o isolamento de falhas "já vem de fábrica". Não vem. Por padrão, se uma única mensagem de um lote falhar durante o processamento, a Lambda inteira é considerada como falha e o lote inteiro volta pra fila — inclusive as mensagens que tinham processado com sucesso.
+
+Pra ter o isolamento granular de verdade (só a mensagem problemática volta pra fila/DLQ), você precisa:
+
+1. Configurar `functionResponseType: 'ReportBatchItemFailures'` no event source mapping, como no exemplo acima.
+2. No seu handler, retornar explicitamente quais `messageIds` falharam, em vez de simplesmente deixar a função lançar uma exceção genérica.
+
+Sem esses dois pontos, você tem a arquitetura Fan-out, mas ainda com o comportamento "tudo ou nada" que estávamos tentando evitar.
+
+### A armadilha que fica escondida: idempotência
+
+Chegamos num detalhe que costuma pegar quem está começando com mensageria: SQS garante entrega _at-least-once_, não _exactly-once_. Ou seja, mesmo sem nenhuma falha visível no seu código, a mesma mensagem pode ser processada mais de uma vez — por exemplo, se o `VisibilityTimeout` da fila expirar antes da Worker terminar de processar (o SQS assume que a mensagem "morreu" e a entrega de novo pra outra execução), ou em cenários de concorrência entre invocações paralelas.
+
+Por isso, um ponto crítico de configuração é: o `VisibilityTimeout` da fila precisa ser sempre maior que o timeout da Lambda Worker. Se forem parecidos (ou pior, se o timeout da Lambda for maior), você corre o risco real de duas execuções processarem a mesma mensagem ao mesmo tempo.
+
+E, já que reprocessamento é uma garantia da arquitetura e não uma exceção, o código da Worker precisa ser preparado pra isso. A técnica mais direta é usar uma **idempotency key** determinística nas chamadas de escrita — algo derivado da própria entidade que está sendo processada (o ID do contrato, por exemplo), nunca um UUID aleatório gerado a cada tentativa. Se a API/banco que você chama suportar esse conceito (muitos gateways de pagamento e APIs internas bem desenhadas suportam), uma segunda tentativa com a mesma chave é automaticamente identificada como duplicata e ignorada, em vez de criar um registro novo.
+
+## Por que essa abordagem é um divisor de águas?
+
+Para quem está começando agora a trabalhar com mensageria, essa separação pode parecer "trabalho a mais", mas os benefícios aparecem já no primeiro dia no ambiente de produção:
+
+- **Isolamento de Falhas** (com a configuração certa): Se ocorrer uma instabilidade na API de terceiros durante o processamento de um ID específico, apenas essa mensagem vai para a DLQ. As outras milhares de mensagens processam com sucesso. O reprocessamento manual depois fica cirúrgico, rápido e barato.
+- **Fim dos Timeouts:** A Lambda Scheduler só faz consultas e despacha mensagens, algo que roda em segundos. A Lambda Worker processa apenas uma ou poucas mensagens por vez, terminando muito antes dos 15 minutos permitidos.
+- **Desempenho e Escalabilidade:** Deixamos de processar de forma sequencial para aproveitar o poder da nuvem. A AWS invocará múltiplas instâncias da sua Lambda Worker simultaneamente para esvaziar a fila.
+- **Observabilidade mais simples:** cada mensagem gera seu próprio rastro de log isolado. Em vez de garimpar um log gigante de uma execução com 5.000 itens pra achar qual falhou, você olha direto pro log da invocação daquele item específico.
+
+## Conclusão
+
+Resolver problemas de arquitetura na nuvem vai muito além de apenas "fazer o código funcionar". Envolve entender como os serviços interagem, os limites físicos (como tempo e memória) de cada recurso, as garantias reais que cada peça oferece (e as que ela não oferece) e o impacto de custos de uma decisão arquitetural.
+
+O padrão Fan-out usando SQS e Lambda é uma daquelas cartas na manga que todo desenvolvedor Backend/Cloud precisa ter. Ele transforma processos lentos e frágeis em pipelines resilientes e escaláveis — desde que você preste atenção nos detalhes de configuração que não aparecem no primeiro exemplo de código que você encontra por aí.
+
+---
+<ProductCard index={0} />
